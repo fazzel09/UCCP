@@ -6,15 +6,24 @@
     src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
 <script type="text/javascript"
     src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.js"></script>
+<script type="text/javascript" src="Scripts/coursePlanner.js"></script>
+    
 <link rel="stylesheet" type="text/css" href="style.css" />
 <link rel="stylesheet" type="text/css" href="calendar_style.css" />
 <title>University of Cincinnati Course Planner
 </title>
 </head>
 <body>
+
+<?php
+REQUIRE('Scripts/database.php');
+$DB = new DB();
+$DB -> connect();
+?>
+
 <div class="mainwrapper">
 	<div class="menu">
-		MenuTest | Items | Are | Here | Don't | Click | Or | You'll | Explode
+		MenuTest | Items | Are | Here | Don't | Click | Or | You'll | Explode |<a href="admin.php"> Admin page</a>
 	</div>
 
 	<div class="midwrapper">
@@ -56,26 +65,28 @@
         3. BoK Category
         4. "Find Courses" button
         -->
+        <div class="searchresults">
         <div class="searchbar" style="display:none">Search for course name, department, college, etc..</div>
-</div>
 
+
+    			<form action="">
+		<input type="text" name="searchInput" id="searchBox">
+		<input type="button" id="mandatorySearch" value="">
+		</form>
+    	<h3>Results</h3>
+        <div id="results">
+        </div>
+        </div>
+</div>
 	
-    <div class="searchresults">
-    	<h3>Search Results</h3>
-        <div class="row" id="row1">
-            Row 1
-        </div>
-        <div class="row" id="row2">
-            Row 2
-        </div>
-        <div class="row" id="row3">
-            Row 3
-        </div>
-    </div>
    
 	<div class="selectedcourses">
-    <?php require "calendar.php"; ?>
+    <h3>Selected Courses</h3>
 	</div>
+    
+    <div class="schedule">
+    <?php require "calendar.php"; ?>
+    </div>
     </div>
 		
 	

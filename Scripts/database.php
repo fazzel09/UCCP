@@ -2,8 +2,8 @@
 class DB{
 
 	public function connect(){
-		mysql_connect("localhost", "conradjr", "LincolnLog") or die(mysql_error());
-		mysql_select_db("conradjr") or die(mysql_error());
+		mysql_connect("localhost", "root", "") or die(mysql_error());
+		mysql_select_db("courseplanner") or die(mysql_error());
 		
 		return true;
 	}
@@ -44,7 +44,7 @@ class DB{
 	
 	public function searchCourses($search)
 	{
-		$sql = "Select * FROM Courses WHERE courseNum LIKE '%".$search."%' OR CourseName LIKE '%".$search."%'";
+		$sql = "Select courses.CourseName, courses.courseNum, courses.creditHours, sections.sectNum, sections.start_time, sections.end_time, sections.days, sections.callNum FROM Courses JOIN sections ON courses.id = sections.course_id WHERE courseNum LIKE '%".$search."%' OR CourseName LIKE '%".$search."%' ORDER BY courses.courseNum, sections.sectNum";
 		$result = mysql_query($sql) or die(mysql_error());
 		
 		while($row = mysql_fetch_array($result)){

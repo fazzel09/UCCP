@@ -99,8 +99,9 @@ margin-left:auto;
 margin-right:auto;
 background-color:#0B5FA5;
 margin:15px;
-width:25%;
-height:500px;
+width:23%;
+height:auto;
+min-height: 500px;
 line-height: 2em;
 font-size:15px;
 border-radius:15px;
@@ -110,12 +111,10 @@ box-shadow: 3px 3px 4px #000;
 
 .selectedcourses
 {
-margin-left: auto;
-margin-right: auto;
+float: left;
 background-color:#0B5FA5;
-float:left;
 margin:15px;
-width:200px%;
+width:23%;
 height:500px;
 line-height: 2em;
 font-size:15px;
@@ -124,22 +123,67 @@ overflow:hidden;
 box-shadow: 3px 3px 4px #000;
 }
 
-.possiblescheds
+.schedule
 {
-background-color:#0B5FA5;
-margin:15px;
-width:90%;
-line-height: 2em;
-font-size:15px;
-border-radius:15px;
-overflow:hidden;
-box-shadow: 3px 3px 4px #000;
+	float: right;
+	background-color:#0B5FA5;
+	margin:15px;
+	width:42%;
+	height:600px;
+	border-radius:15px;
+	padding:10px;
+	box-shadow: 3px 3px 4px #000;
 }
 
-.row
+
+.courseRow
 {
+	width:96%;
+	float:left;
 	margin-left:10px;
+	height:auto;
 	text-align:left;
+	background-color:#999;
+	border-radius:10px;
+	margin:5px;
+	box-shadow: 3px 3px 4px #000;
+}
+
+.sectionRow
+{
+	float:right;
+	margin-left:10px;
+	height:60px;
+	text-align:left;
+	background-color:#FFF;
+	border-radius:10px;
+	margin:5px;
+	box-shadow: 3px 3px 4px #000;	
+	width:200px;
+}
+
+#mandatorySearch
+{
+	background-image:url(Images/searchbutton.png);
+	background-size: 25px;
+	background-repeat:no-repeat;
+	width:27px;
+	height:27px;
+}
+
+.delete
+{
+	float:right;
+	color:white;
+	width:15px;
+	height:15px;
+	display:none;
+	text-align:right;
+}
+
+.courseInfo
+{
+	float: left;
 }
 
 
