@@ -1,9 +1,5 @@
 $(document).ready(function(){
-	
-	$('#results').click(function(event){
-		console.log('Expand sections: ' + event.target.className);	
-		toggleSections(event.target.className.split(' ')[1]);
-	});
+	$('.mainwrapper').disableSelection();
 	$('#mandatorySearch').click(function(){
 		$.ajax({
 			type:'POST',
@@ -15,7 +11,9 @@ $(document).ready(function(){
 			success:function(data){
 				var html ="";
 				
-				updateResultsList(data)
+				generateArrays(data);
+				
+				updateResultsList(data);
 
 			},
 			error:function(){
@@ -26,117 +24,140 @@ $(document).ready(function(){
 	
 	function toggleSections( className )
 	{
-		console.log('class name' + className);
-		if($('.sectionRow '+className).is(':visible'))
+		if($('.sectionData.'+className).is(':visible'))
 		{
-			console.log('Is visible');
+			console.log("It's visible");
+			$(".sectionData."+className).hide();
+			$('.showSections.'+className).html('Show Sections');	
+		}
+		else
+		{
+			console.log('Not Visible');
+			$(".sectionData."+className).show();
+			$('.showSections.'+className).html('Hide Sections');	
+		}
+		console.log('class name ' + className);
+
+		/*if($('.sectionData.'+className).is(':visible'))
+		{
+			$('.sectionData').css('display','block');
 		}
 		else
 		{
 			console.log('Not visible');	
-		}
+		}*/
 	}
+	
+	var searchResults = new Array();
+	var selectedCourses = new Array();
 
-function updateResultsList(data)
-{
-	$('#results').html("");
-	var courseNum = null;
-	$.each(data, function(key, value){
-		
-		if(value['courseNum'] != courseNum)
+	function generateArrays(data)
+	{
+		var courseNum = null;
+		$.each(data, function(key,value)
 		{
-			/*Generate the class row, and the first section row */
+			
 			courseNum = value['courseNum'];
-			$('#results').append('<div class="courseRow '+value['courseNum']+'"><div class="courseInfo">'+value['CourseName']+'<br>'+value['courseNum']+'</div>'+
-			'<div class="showSections '+ value['courseNum']+'">Show Sections</div><div class="sectionData'+value['courseNum']+'"></div></div>');	
-			console.log('Adding sections');
-			insertSectionInfo(value);
-		}
-		else
-		{	
-			insertSectionInfo(value);
-		}
+			searchResults.push(new Course(value));
 
-				
-	});
-	makeDraggable();
-}
-
-function insertSectionInfo(value)
-{
-	$('.sectionData'+value['courseNum']).append('<div class="sectionRow '+value['callNum']+'" >Section: '+value['sectNum']+' Call: '+value['callNum']+'</br>'+value['days']+'\t'+value['start_time']+'-'+value['end_time']+'</div>');
-}
-var dragElement
-function makeDraggable(){
-	
-$('.sectionRow').draggable({
-	//revert:true,
-	helper:'clone',
-	connectToSortable: '.selectedcourses',
-});
-
-$('.selectedcourses').sortable({
-	receive: function(event, ui){
-		console.log('Section Recieved: ' + ui.item.attr('class'));
+		});
 	}
-});
-	
-	
-	$(".selectedcourses").sortable(
+
+	function Course(value)
 	{
+		this.courseName = value['CourseName'];
+		this.courseNum = value['courseNum'];	
+		this.courseName = value['CourseName'];
+		this.courseNum = value['courseNum'];	
+		this.callNum = value['callNum'];
+		this.section = value['sectNum'];
+		this.days = value['days'];
+		this.startTime = value['start_time'];
+		this.endTime = value['end_time'];
 		
-	update:updateClasses
-	});
-	$(".sectionRow").draggable(
+		this.courseRow = '<div class="courseRow '+this.courseNum+'"><div class="courseInfo">'+this.courseName+'<br>'+this.courseNum+
+			'</div><div class="showSections '+this.courseNum+'" id="showSections">Show Sections</div><div class="sectionData '+this.courseNum+'"></div></div>';
+		this.sectionRow = '<div class="sectionRow '+this.callNum+'" >Section: '+this.section+' Call: '+this.callNum+'</br>'+this.days+'\t'+
+			this.startTime+'-'+this.endTime+'</div>';
+		this.selectedRow = '<div class="selectedRow '+this.callNum+'">'+this.courseNum+'<br/>'+this.days+'\t'+this.startTime+'-'+this.endTime+'</div>';
+	}
+
+	function updateResultsList(data)
 	{
-		start:function(event,ui){
-			console.log("Drag Started " + event.target.className );
-			dragElement = event.target.className;	
-		},
-		stop: function(event, ui){
-			console.log("Drag Stopped ");
-			if($('.selectedcourses').find("."+dragElement).size()>1)
+		$('#results').html("");
+		var courseNum = null;
+		var curRow;
+		for(var i =0;i<searchResults.length; i++)
+		{
+			curRow = searchResults[i];
+			if(curRow.courseNum != courseNum)
 			{
-				console.log("Already exists, can't add classes twice");
-				$("." + event.target.className).draggable(
-				{
-					revert:true
-				});
+				//add a course row, and the first section
+				courseNum = curRow.courseNum;
+				$('#results').append(curRow.courseRow);
+				$('.sectionData.'+courseNum).append(curRow.sectionRow);
 			}
-			updateClasses(event, ui);
-		},
-		helper:"clone",
+			else
+			{
+				//add a section row
+				$('.sectionData.'+courseNum).append(curRow.sectionRow);
+			}
+		}
+		$(".sectionData").hide();
+		$('.showSections').click(function(event){
+			
+		toggleSections(event.target.className.split(' ')[1]);
 	});
-};
+		makeDraggable();
+	}
 
-
-function updateClasses(event, ui)
-{
-	console.log("Recieved item " + dragElement);
-	console.log("Drag Element " + dragElement);
-	//$(".searchresults "+dragElement).draggable('disable');
+	var dragElement
+	function makeDraggable(){
+		
+		$('.sectionRow').draggable({
+			//revert:true,
+			helper:'clone',
+			connectToSortable: '.selectedcourses',
+			revert:true
+		});
 	
-	$rowDelete = $('.selectedcourses '+dragElement+' > .delete');
-	$row = $('.selectedcourses '+dragElement);
+		$('.selectedcourses').sortable({
+			receive: function(event, ui){
+				console.log('Section Recieved: ' + ui.item.attr('class'));
+				var callnum = ui.item.attr('class').split(' ')[1];
+				$('.sectionRow.'+callnum).draggable('disable');
+			}
+		});
+	};
 	
-	$row.bind('mouseover',function(e) {
-	  	console.log("dragElement" + dragElement);
-		$rowDelete.css('display', 'block');
-
-      return false;
-    });
 	
-	$row.bind('mouseout',function(e) {
-	  	console.log("mouseOut");
-		$rowDelete.css('display', 'none');
-
-      return false;
-    });
+	function updateClasses(event, ui)
+	{
+		console.log("Recieved item " + dragElement);
+		console.log("Drag Element " + dragElement);
+		//$(".searchresults "+dragElement).draggable('disable');
+		
+		$rowDelete = $('.selectedcourses '+dragElement+' > .delete');
+		$row = $('.selectedcourses '+dragElement);
+		
+		$row.bind('mouseover',function(e) {
+			console.log("dragElement" + dragElement);
+			$rowDelete.css('display', 'block');
 	
-	$rowDelete.bind('click', function(e){
-		console.log("Delete Clicked");
-		$row.remove();
-	});
+		  return false;
+		});
+		
+		$row.bind('mouseout',function(e) {
+			console.log("mouseOut");
+			$rowDelete.css('display', 'none');
+	
+		  return false;
+		});
+		
+		$rowDelete.bind('click', function(e){
+			console.log("Delete Clicked");
+			$row.remove();
+		});
 /*	$row.hover(function(){
 		console.log("Test");
 		console.log("dragElement");

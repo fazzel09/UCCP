@@ -162,6 +162,11 @@ box-shadow: 3px 3px 4px #000;
 	width:200px;
 }
 
+.sectionData
+{
+	/*display: none;*/	
+}
+
 #mandatorySearch
 {
 	background-image:url(Images/searchbutton.png);
@@ -179,6 +184,13 @@ box-shadow: 3px 3px 4px #000;
 	height:15px;
 	display:none;
 	text-align:right;
+}
+
+.showSections
+{
+	float:right;
+	margin-top:30px;
+	font-size: 10px;	
 }
 
 .courseInfo
