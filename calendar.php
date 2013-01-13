@@ -2,36 +2,36 @@
 <!--     <tr><td class="30min"></td><td class="30min"></td><td class="30min"></td><td class="30min"></td><td class="30min"></td><td class="30min"></td><td class="30min"></td><td class="30min"></td></tr>
  --> Calendar Implementation
    <table>
-    <tr><td></td><td>Mon</td><td>Tue</td><td>Wed</td><td>Thu</td><td>Fri</td><td>Sat</td><td>Sun</td></tr>
-    <tr><td>7am</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td></td><td div class="M">Mon</td><td div class="T">Tue</td><td div class="W">Wed</td><td div class="R">Thu</td><td div class="F">Fri</td><td div class="S">Sat</td><td div class="U">Sun</td></tr>
+    <tr><td class = "07">7am</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
     <tr><td class="30min"></td><td class="30min"></td><td class="30min"></td><td class="30min"></td><td class="30min"></td><td class="30min"></td><td class="30min"></td><td class="30min"></td></tr>
-    <tr><td>8am</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td class = "08">8am</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
     <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-    <tr><td>9am</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td class = "09">9am</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
     <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-    <tr><td>10am</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td class = "10">10am</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
     <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-    <tr><td>11am</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td class = "11">11am</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
     <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-    <tr><td>12pm</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td class = "12">12pm</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
     <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-    <tr><td>1pm</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td class = "13">1pm</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
     <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-    <tr><td>2pm</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td class = "14">2pm</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
     <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-    <tr><td>3pm</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td class = "15">3pm</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
     <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-    <tr><td>4pm</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td class = "16">4pm</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
     <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-    <tr><td>5pm</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td class = "17">5pm</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
     <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-    <tr><td>6pm</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td class = "18">6pm</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
     <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-    <tr><td>7pm</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td class = "19">7pm</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
     <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-    <tr><td>8pm</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td class = "20">8pm</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
     <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-    <tr><td>9pm</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td class = "21">9pm</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
     <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
    </table>
    </div>   

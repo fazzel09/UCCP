@@ -1,5 +1,6 @@
 $(document).ready(function(){
 	$('.mainwrapper').disableSelection();
+	
 	$('#mandatorySearch').click(function(){
 		$.ajax({
 			type:'POST',
@@ -10,14 +11,19 @@ $(document).ready(function(){
 			},
 			success:function(data){
 				var html ="";
-				
+				console.log("Success");
 				generateArrays(data);
 				
 				updateResultsList(data);
 
 			},
-			error:function(){
-				alert("Search failed");
+			error:function(xhr, ajaxOptions, thrownError){
+				if(xhr.status == 200)
+				{
+					alert("No results found");
+				}else
+				
+				alert("Search failed. Response status: "+xhr.status);
 			}
 		});
 	});
@@ -37,22 +43,11 @@ $(document).ready(function(){
 			$('.showSections.'+className).html('Hide Sections');	
 		}
 		console.log('class name ' + className);
-
-		/*if($('.sectionData.'+className).is(':visible'))
-		{
-			$('.sectionData').css('display','block');
-		}
-		else
-		{
-			console.log('Not visible');	
-		}*/
 	}
-	
-	var searchResults = new Array();
-	var selectedCourses = new Array();
 
 	function generateArrays(data)
 	{
+		searchResults = new Array();
 		var courseNum = null;
 		$.each(data, function(key,value)
 		{
@@ -72,21 +67,57 @@ $(document).ready(function(){
 		this.callNum = value['callNum'];
 		this.section = value['sectNum'];
 		this.days = value['days'];
-		this.startTime = value['start_time'];
-		this.endTime = value['end_time'];
+		this.startTime = new Time( value['start_time']);
+		this.endTime = new Time( value['end_time']);
+		this.duration = new Duration(this.startTime, this.endTime);
+		this.color = null;
 		
-		this.courseRow = '<div class="courseRow '+this.courseNum+'"><div class="courseInfo">'+this.courseName+'<br>'+this.courseNum+
-			'</div><div class="showSections '+this.courseNum+'" id="showSections">Show Sections</div><div class="sectionData '+this.courseNum+'"></div></div>';
-		this.sectionRow = '<div class="sectionRow '+this.callNum+'" >Section: '+this.section+' Call: '+this.callNum+'</br>'+this.days+'\t'+
-			this.startTime+'-'+this.endTime+'</div>';
-		this.selectedRow = '<div class="selectedRow '+this.callNum+'">'+this.courseNum+'<br/>'+this.days+'\t'+this.startTime+'-'+this.endTime+'</div>';
+		this.courseRow = '<div class="courseRow '+this.courseNum+'"><div class="courseInfo">'
+			+this.courseName+'<br>'+this.courseNum+'</div><div class="showSections '+this.courseNum
+			+'" id="showSections">Show Sections</div><div class="sectionData '+this.courseNum+'"></div></div>';
+		this.sectionRow = '<div class="sectionRow '+this.callNum+'" ><div class="deleteSection '
+			+this.callNum+'">X</div><div class="courseNum">'+this.courseNum+'</div><div class="sectionInfo">Section: '
+			+this.section+' Call: '+this.callNum+'</div></br>'+this.days+'\t'+
+			this.startTime.string+'-'+this.endTime.string+'</div>';
+	}
+	
+	function Time(value)
+	{
+		var parsed = value.split(':');
+		this.hour = parsed[0];
+		this.minute = parsed[1];
+		if(this.hour > 12)
+		{
+			this.hourString = this.hour-12;
+		}
+		else
+		{
+			this.hourString = this.hour;	
+		}
+		this.string = this.hourString+':'+this.minute;
 	}
 
+	function Duration(start, end)
+	{
+		this.hours = end.hour-start.hour;
+		this.minutes = end.minute-start.minute;
+		
+		if(this.hours < 0)
+		{
+			this.hours = this.hours+12;
+		}
+		if(this.minutes < 0)
+		{
+			this.hours = this.hours-1;
+			this.minutes = this.minutes + 60;
+		}
+	}
 	function updateResultsList(data)
 	{
 		$('#results').html("");
 		var courseNum = null;
 		var curRow;
+		$('#results').remove('.courseRow');
 		for(var i =0;i<searchResults.length; i++)
 		{
 			curRow = searchResults[i];
@@ -111,65 +142,75 @@ $(document).ready(function(){
 		makeDraggable();
 	}
 
-	var dragElement
 	function makeDraggable(){
 		
 		$('.sectionRow').draggable({
 			//revert:true,
 			helper:'clone',
 			connectToSortable: '.selectedcourses',
-			revert:true
 		});
 	
 		$('.selectedcourses').sortable({
 			receive: function(event, ui){
 				console.log('Section Recieved: ' + ui.item.attr('class'));
-				var callnum = ui.item.attr('class').split(' ')[1];
-				$('.sectionRow.'+callnum).draggable('disable');
+				
+				var callNum = ui.item.attr('class').split(' ')[1];
+				
+				//Find the course corresponding with this callnum
+				for(var i=0;i<searchResults.length; i++)
+					{
+						if(searchResults[i].callNum == callNum)
+						{
+							console.log('course found');
+							var course = searchResults[i];
+							break;
+						}
+					}
+				
+				if(colorIndex >= colors.length)
+				{
+					colorIndex = 0;
+				}
+				course.color = colors[colorIndex];
+				colorIndex++;
+				
+				$('.selectedcourses .sectionRow.'+callNum).css('background-color', course.color);
+				$('.sectionRow.'+callNum).draggable('disable');
+				addToCalendar(course);
+				$('.deleteSection.'+callNum).click( function()
+				{
+					console.log("Delete Clicked");
+					$('.selectedcourses .sectionRow.'+callNum).remove();
+					$('.sectionBlock.'+callNum).remove();
+					$('.sectionRow.'+callNum).draggable('enable');
+					
+				});
 			}
 		});
 	};
 	
-	
-	function updateClasses(event, ui)
+	function addToCalendar(course)
 	{
-		console.log("Recieved item " + dragElement);
-		console.log("Drag Element " + dragElement);
-		//$(".searchresults "+dragElement).draggable('disable');
-		
-		$rowDelete = $('.selectedcourses '+dragElement+' > .delete');
-		$row = $('.selectedcourses '+dragElement);
-		
-		$row.bind('mouseover',function(e) {
-			console.log("dragElement" + dragElement);
-			$rowDelete.css('display', 'block');
-	
-		  return false;
-		});
-		
-		$row.bind('mouseout',function(e) {
-			console.log("mouseOut");
-			$rowDelete.css('display', 'none');
-	
-		  return false;
-		});
-		
-		$rowDelete.bind('click', function(e){
-			console.log("Delete Clicked");
-			$row.remove();
-		});
-/*	$row.hover(function(){
-		console.log("Test");
-		console.log("dragElement");
-		$rowDelete.css('display', 'block');
-		//$rowDelete.css('float','right');
-	});
-	
-	$row.mouseout(function(){
-		console.log("Mouse out");
-		$rowDelete.css('display', 'none');
+		var startPositionX = Math.round($('.'+course.startTime.hour).position().top + course.startTime.minute/60*hourHeight);
+		var blockHeight=(course.duration.hours*hourHeight) + (course.duration.minutes/60*hourHeight);
 
-	});
-	*/
-}
+		
+		for(var i=0;i<course.days.length;i++)
+		{		
+		$('.schedule').append('<div class="sectionBlock '+course.callNum+' '+course.days[i]+'">'+course.callNum+'</div>');
+		$('.sectionBlock.'+course.callNum+'.'+course.days[i]).css('width',dayWidth);
+		$('.sectionBlock.'+course.callNum+'.'+course.days[i]).css('height',blockHeight);
+		$('.sectionBlock.'+course.callNum+'.'+course.days[i]).css('background-color',course.color);
+		$('.sectionBlock.'+course.callNum+'.'+course.days[i]).css('top',startPositionX);
+		console.log("course Day: "+$('.'+course.days[i]).position());
+		$('.sectionBlock.'+course.callNum+'.'+course.days[i]).css('left',$('.'+course.days[i]).position().left + 'px');
+		}
+	};
+		
+	var searchResults = new Array();
+	var selectedCourses = new Array();
+	var hourHeight = $('.08').position().top - $('.07').position().top
+	var dayWidth = 60;
+	var colors = new Array('blue', 'red','orange','green','yellow','pink','purple');
+	var colorIndex = 0;
 });
