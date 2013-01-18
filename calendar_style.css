@@ -29,7 +29,7 @@
 
 .calendar tr
 {
-    height:15px;
+    height:16px;
     width:100%;
     text-align:center;
 	float: right;
@@ -38,6 +38,7 @@
 
 .calendar td
 {
+	height:15px;
     width:59px;
     border-top:1px solid gray;
     border-left:1px solid gray;
@@ -84,7 +85,7 @@
 {
     border-bottom:1px solid gray;
     border-right:1px solid gray;
-    height:3%;
+    /*height:3%;*/
     width:13.8%;
     float:left;
 } /* height is 5.9 for full hours, 3 and 2.8 (top) for half hours */
@@ -93,7 +94,7 @@
 {   
     border-bottom:1px dashed gray;
     border-right:1px solid gray;
-    height:2.86%;
+    /*height:2.86%;*/
     width:13.8%;
     float:left;
 }

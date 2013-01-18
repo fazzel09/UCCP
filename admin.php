@@ -15,7 +15,7 @@ if(isset($_POST['addCourse'])) {
 	$DB -> addCourse($_POST['courseNum'], $_POST['creditHours'], $_POST['courseName'], $_POST['courseDesc']);
 }
 if(isset($_POST['addSection'])){
-	$DB -> addSection($_POST['courseNum'], $_POST['sectNum'], $_POST['callNum'], $_POST['instruction'], $_POST['campus'], $_POST['days'], $_POST['times'], $_POST['location']);
+	$DB -> addSection($_POST['courseNum'], $_POST['sectNum'], $_POST['callNum'], $_POST['instruction'], $_POST['campus'], $_POST['days'], $_POST['startTime'], $_POST['endTime'], $_POST['location']);
 	}	
 
 ?>
@@ -45,7 +45,8 @@ if(isset($_POST['addSection'])){
 	Call Number:<input type="text" name="callNum"><br>
 	Instruction:<input type="text" name="instruction">
 	Days:<input type="text" name="days">
-	Times:<input type="text" name="times">
+	StartTime:<input type="text" name="startTime">
+    EndTime:<input type="text" name="endTime">
 	Campus:<input type="text" name="campus">
 	Location:<input type="text" name="location"><br>
 	<input type="submit"name="addSection" value="submit">
@@ -72,7 +73,7 @@ if(isset($_POST['addSection'])){
 	?>
 	</table
 	
-	</div>
+	></div>
 	</div>
 
 	

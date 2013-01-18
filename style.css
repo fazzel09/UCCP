@@ -181,10 +181,6 @@ body
 	display:none;
 }
 
-.selectedCourses .sectionRow
-{
-		
-}
 #results .deleteSection
 {
 	display: none;
@@ -248,5 +244,18 @@ td
 {
 	position:absolute;
 	border-radius:10px;
-	box-shadow: 3px 3px 4px #000;	
+	box-shadow: 3px 3px 4px #000;
+	opacity:.5;
+}
+
+#selectionBox
+{
+	background:black;
+	opacity:.25;
+	position:absolute;	
+}
+
+.selectionOptions
+{
+	display:none;	
 }

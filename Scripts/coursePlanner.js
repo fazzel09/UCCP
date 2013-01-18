@@ -1,5 +1,5 @@
 $(document).ready(function(){
-	$('.mainwrapper').disableSelection();
+	$('body').disableSelection();
 	
 	$('#mandatorySearch').click(function(){
 		$.ajax({
@@ -10,7 +10,6 @@ $(document).ready(function(){
 				search:$('#searchBox').val()
 			},
 			success:function(data){
-				var html ="";
 				console.log("Success");
 				generateArrays(data);
 				
@@ -26,6 +25,65 @@ $(document).ready(function(){
 				alert("Search failed. Response status: "+xhr.status);
 			}
 		});
+	});
+	
+	$('#selectionSearch').click(function()
+	{
+	if(searchStartTime.length<3)
+		{
+			searchStartTime+=':00';	
+		}
+		else
+		{
+			searchStartTime = searchStartTime.substring(0, 2) + ':' + searchStartTime.substring(2, searchStartTime.length)
+		}
+		
+		if(searchEndTime.length<3)
+		{
+			searchEndTime+=':00';
+		}
+		else
+		{
+			searchEndTime = searchEndTime.substring(0, 2) + ':' + searchEndTime.substring(2, searchEndTime.length)
+		}
+		
+		console.log('Days: '+searchDay+', Times: '+searchStartTime+'-'+searchEndTime);
+		
+		$.ajax({
+			type:'POST',
+			url:'Scripts/database.php',
+			dataType:'json',
+			data:{
+				selectionSearchDay: searchDay, 
+				searchStartTime: searchStartTime,
+				searchEndTime: searchEndTime
+			},
+			success:function(data){
+				console.log("sectionSearch success");
+				generateArrays(data);
+				updateResultsList(data);
+				$('#selectionBox').remove();
+				$('.selectionOptions').css('display','none');
+			},
+			error:function(xhr, ajaxOptions, thrownError)
+			{
+				console.log("selectionSearch failed" + thrownError);
+				if(xhr.status == 200)
+				{
+					alert("No results found");
+				}
+				else
+				{
+				alert("Search failed. Response status: "+xhr.status);
+				}
+			}
+		});
+	});
+	
+	$('#cancelSelection').click(function(e)
+	{
+		$('#selectionBox').remove();
+		$('.selectionOptions').css('display','none');
 	});
 	
 	function toggleSections( className )
@@ -137,8 +195,8 @@ $(document).ready(function(){
 		$(".sectionData").hide();
 		$('.showSections').click(function(event){
 			
-		toggleSections(event.target.className.split(' ')[1]);
-	});
+			toggleSections(event.target.className.split(' ')[1]);
+		});
 		makeDraggable();
 	}
 
@@ -149,6 +207,11 @@ $(document).ready(function(){
 			helper:'clone',
 			connectToSortable: '.selectedcourses',
 		});
+		
+		for(var i=0; i<selectedCourses.length; i++)
+		{
+			$('#results .sectionRow.'+selectedCourses[i].callNum).draggable('disable');	
+		}
 	
 		$('.selectedcourses').sortable({
 			receive: function(event, ui){
@@ -158,14 +221,14 @@ $(document).ready(function(){
 				
 				//Find the course corresponding with this callnum
 				for(var i=0;i<searchResults.length; i++)
+				{
+					if(searchResults[i].callNum == callNum)
 					{
-						if(searchResults[i].callNum == callNum)
-						{
-							console.log('course found');
-							var course = searchResults[i];
-							break;
-						}
+						console.log('course found');
+						var course = searchResults[i];
+						break;
 					}
+				}
 				
 				if(colorIndex >= colors.length)
 				{
@@ -176,36 +239,221 @@ $(document).ready(function(){
 				
 				$('.selectedcourses .sectionRow.'+callNum).css('background-color', course.color);
 				$('.sectionRow.'+callNum).draggable('disable');
+				
 				addToCalendar(course);
+				selectedCourses.push(course);
+				
 				$('.deleteSection.'+callNum).click( function()
 				{
 					console.log("Delete Clicked");
-					$('.selectedcourses .sectionRow.'+callNum).remove();
-					$('.sectionBlock.'+callNum).remove();
-					$('.sectionRow.'+callNum).draggable('enable');
-					
+					deleteSelectedCourse(callNum);
 				});
 			}
 		});
 	};
 	
-	function addToCalendar(course)
+	function addToCalendar(addedCourse)
 	{
-		var startPositionX = Math.round($('.'+course.startTime.hour).position().top + course.startTime.minute/60*hourHeight);
-		var blockHeight=(course.duration.hours*hourHeight) + (course.duration.minutes/60*hourHeight);
-
+		var startPositionX = Math.round($('.'+addedCourse.startTime.hour).position().top + addedCourse.startTime.minute/60*hourHeight);
+		var blockHeight=(addedCourse.duration.hours*hourHeight) + (addedCourse.duration.minutes/60*hourHeight);
 		
-		for(var i=0;i<course.days.length;i++)
-		{		
-		$('.schedule').append('<div class="sectionBlock '+course.callNum+' '+course.days[i]+'">'+course.callNum+'</div>');
-		$('.sectionBlock.'+course.callNum+'.'+course.days[i]).css('width',dayWidth);
-		$('.sectionBlock.'+course.callNum+'.'+course.days[i]).css('height',blockHeight);
-		$('.sectionBlock.'+course.callNum+'.'+course.days[i]).css('background-color',course.color);
-		$('.sectionBlock.'+course.callNum+'.'+course.days[i]).css('top',startPositionX);
-		console.log("course Day: "+$('.'+course.days[i]).position());
-		$('.sectionBlock.'+course.callNum+'.'+course.days[i]).css('left',$('.'+course.days[i]).position().left + 'px');
+		
+		updateDayArrays(addedCourse.days, addedCourse, addCourseToDayArray)
+		//For each day the section is on, compute the width
+		for(var i=0;i<addedCourse.days.length;i++)
+		{	
+			var addedCourseDay = addedCourse.days[i];
+			
+			$('.schedule').append('<div class="sectionBlock '+addedCourse.callNum+' '+addedCourseDay+'"></div>');
+			$('.sectionBlock.'+addedCourse.callNum+'.'+addedCourseDay).css('width',dayWidth);
+			$('.sectionBlock.'+addedCourse.callNum+'.'+addedCourseDay).css('height',blockHeight);
+			$('.sectionBlock.'+addedCourse.callNum+'.'+addedCourseDay).css('background-color',addedCourse.color);
+			$('.sectionBlock.'+addedCourse.callNum+'.'+addedCourseDay).css('top',startPositionX);
+			console.log("course Day: "+$('.'+addedCourseDay).position());
+			$('.sectionBlock.'+addedCourse.callNum+'.'+addedCourseDay).css('left',$('.'+addedCourseDay).position().left+'px');
 		}
+
+		//updateDisplay(addedCourse);
+		updateDayArrays(addedCourse.days, addedCourse.callNum, checkConflicts);
 	};
+	function addCourseToDayArray(array, course, notUsed)
+	{
+		var startHour = course.startTime.hour;
+		var startMin = course.startTime.minute;
+		var startIndex = ((course.startTime.hour-7) * 12)+(course.startTime.minute/5);
+		var endIndex = ((course.endTime.hour-7) * 12)+(course.endTime.minute/5);
+		
+		for(var i=startIndex; i<=endIndex; i++)
+		{
+			addCourse(course.callNum, array[i]);	
+		}
+	}
+	
+	function addCourse(callNum, calendarBlock)
+	{
+		calendarBlock.courses.push(callNum);	
+	}
+	function outputCourseDayArrays()
+	{
+		for(var i=0; i<monday.length; i++)
+		{
+			console.log('M '+ monday[i].courses[0] + 'T' +tuesday[i].courses[0]);	
+		}
+	}
+	
+
+	
+	function CalendarBlock(value)
+	{
+		if(value == null)
+		{
+			this.courses = new Array()
+			return;
+		}
+		
+		
+		this.courses.push(callNum);	
+		
+	}
+	
+	function updateDayArrays(days, callNum, operation)
+	{
+		for(i=0;i<days.length;i++)
+		{
+			switch(days[i])
+			{
+				case 'M':
+					operation(monday, callNum, 'M');
+				break;
+				case 'T':
+					operation(tuesday, callNum, 'T');
+					break;
+				case 'W':
+					operation(wednesday, callNum, 'W');
+					break;
+				case 'R':
+					operation(thursday, callNum, 'R');
+					break;
+				case 'F':
+					operation(friday, callNum, 'F');
+					break;
+				default:
+					break;		
+			}
+		}
+	}
+	
+	function checkConflicts(dayArray, callNum, day)
+	{
+		for(var i=0; i<dayArray.length; i++)
+		{
+			var curBlock = dayArray[i]
+			
+			for(var j=0;j<curBlock.courses.length;j++)
+			{
+				$('.sectionBlock.'+curBlock.courses[j]+'.'+day).css('width',dayWidth/curBlock.courses.length);
+				$('.sectionBlock.'+curBlock.courses[j]+'.'+day).css('left',($('.'+day).position().left)+j*60/curBlock.courses.length+'px');
+			}		
+		}
+	}
+	
+	function removeCourseFromDayArray(dayArray, callNum, day)
+	{
+		for(var i=0; i<dayArray.length; i++)
+		{
+			var curBlock = dayArray[i];
+			for(var j=0; j<curBlock.courses.length;j++)
+			{
+				if(curBlock.courses[j] == callNum)
+				{
+					curBlock.courses.splice(j,1);	
+				}
+			}
+		}
+	}
+
+	function deleteSelectedCourse(callNum)
+	{
+		$('.selectedcourses .sectionRow.'+callNum).remove();
+		$('.sectionBlock.'+callNum).remove();
+		$('.sectionRow.'+callNum).draggable('enable');
+		for(var i=0; i<selectedCourses.length; i++)
+		{
+			if(selectedCourses[i].callNum == callNum)
+			{
+				selectedCourses.splice(i,1);
+				break;
+			}
+		}
+		updateDayArrays('MTWRF', callNum, removeCourseFromDayArray);
+		updateDayArrays('MTWRF', callNum, checkConflicts);
+		
+	};
+	
+	function outputSelectedCourses()
+	{
+		console.log("selectedCourses: ");
+		for(var i =0;i<selectedCourses.length; i++)
+		{
+			console.log(i+": "+selectedCourses[i].callNum);
+		}
+	}
+	
+	$('#selectionBox').dblclick(function(e)
+	{
+			console.log('Double Click');	
+	});
+	
+	function resetSelectionListeners()
+	{
+		$('.calendar td').mousedown(function(e)
+		{
+			$('.selectionOptions').css('display', 'inline');
+			console.log('target: '+e.target.className);
+			var target = e.target;
+			
+			searchStartTime = e.target.className.split(' ')[0];
+			searchDay = e.target.className.split(' ')[1];
+			
+			var top = $(this).offset().top;
+			var left = $(this).offset().left;
+			
+			$('body').append('<div id="selectionBox"></div>');
+			$('#selectionBox').css('top', top);
+			$('#selectionBox').css('left', left);
+			$('#selectionBox').css('width', dayWidth);
+			$('#selectionBox').css('height', '0');
+	
+			$('.calendar .'+target.className.split(' ')[1]+', #selectionBox').mouseover(function(e)
+			{
+				$('#selectionBox').css('height', ($(this).offset().top - top))
+			});
+			
+			$('#selectionBox, .calendar td').mouseup(function(e)
+			{
+				searchEndTime = e.target.className.split(' ')[0];
+				$('#selectionBox, .calendar td').unbind();
+				console.log('mouseup '+e.target.className);
+				resetSelectionListeners();
+			});
+		});
+	}
+	
+	resetSelectionListeners();
+		
+		
+	
+	$('#searchDialog').dialog({
+		autoOpen:false,
+		modal:true,
+		height:200,
+		buttons:{ "Search":function(){console.log('Search');}, "Cancel":			function(){$(this).dialog("close");}},
+		close:function(){$('#selectionBox').remove();}
+	});
+	
+	var searchStartTime;
+	var searchEndTime;
+	var searchDay;
 		
 	var searchResults = new Array();
 	var selectedCourses = new Array();
@@ -213,4 +461,23 @@ $(document).ready(function(){
 	var dayWidth = 60;
 	var colors = new Array('blue', 'red','orange','green','yellow','pink','purple');
 	var colorIndex = 0;
+	
+	var monday = new Array();
+	var tuesday = new Array();
+	var wednesday = new Array();
+	var thursday = new Array();
+	var friday = new Array();
+	
+	for(var i=0;i<169;i++)
+	{
+		monday[i]=new CalendarBlock(null);
+		tuesday[i]=new CalendarBlock(null);
+		wednesday[i]=new CalendarBlock(null);
+		thursday[i]=new CalendarBlock(null);
+		friday[i]=new CalendarBlock(null);
+	}
+	
+	var hour =12;
+	var halfHour = 6;
+	var quarterHour = 3;
 });

@@ -7,7 +7,8 @@
 <script type="text/javascript"
     src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.js"></script>
 <script type="text/javascript" src="Scripts/coursePlanner.js"></script>
-    
+  
+  <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
 <link rel="stylesheet" type="text/css" href="style.css" />
 <link rel="stylesheet" type="text/css" href="calendar_style.css" />
 <title>University of Cincinnati Course Planner
@@ -68,11 +69,9 @@ $DB -> connect();
         <div class="searchresults">
         <div class="searchbar" style="display:none">Search for course name, department, college, etc..</div>
 
-
-    			<form action="">
 		<input type="text" name="searchInput" id="searchBox">
 		<input type="button" id="mandatorySearch" value="">
-		</form>
+		
     	<h3>Results</h3>
         <div id="results">
         </div>
@@ -86,11 +85,25 @@ $DB -> connect();
     
     <div class="schedule">
     <?php require "calendar.php"; ?>
+    
+    <div class="selectionOptions">
+        <button id="selectionSearch" value="selectionSearch">Find Courses</button>
+        <button id="cancelSelection" value="cancelSelection">Cancel</button>
+    </div>
+    
     </div>
     </div>
 		
+    
 	
 	
 </div>
+
+<div id="searchDialog">
+	Times: <input type="text" name="times" id="selectionSearchTimes"><br/>
+    Days: <input type="text" id="selectionSearchDays" name="days"><br/>
+    <input type="button" id="selectionSearch" value="search">
+</div>
+
 </body>
 </html>

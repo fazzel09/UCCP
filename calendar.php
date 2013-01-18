@@ -2,8 +2,31 @@
 <!--     <tr><td class="30min"></td><td class="30min"></td><td class="30min"></td><td class="30min"></td><td class="30min"></td><td class="30min"></td><td class="30min"></td><td class="30min"></td></tr>
  --> Calendar Implementation
    <table>
-    <tr><td></td><td div class="M">Mon</td><td div class="T">Tue</td><td div class="W">Wed</td><td div class="R">Thu</td><td div class="F">Fri</td><td div class="S">Sat</td><td div class="U">Sun</td></tr>
-    <tr><td class = "07">7am</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr class='dayHeader'><td></td><td div class="M">Mon</td><td div class="T">Tue</td><td div class="W">Wed</td><td div class="R">Thu</td><td div class="F">Fri</td><td div class="S">Sat</td><td div class="U">Sun</td></tr>
+    <?php
+	$hourCounter = 7;
+	for($i=0;$i<15;$i++)
+	{		
+		if($hourCounter<10)
+		{
+			$hourCounter = '0'.$hourCounter;
+		}
+		if($hourCounter>12)
+		{
+			$hourString = ($hourCounter -12).'pm';	
+		}
+		else
+		{
+			$hourString = $hourCounter.'am';	
+		}
+		echo('<tr><td class ="'.$hourCounter.' 00 hourHeader">'.$hourString.'</td><td class="'.$hourCounter.' M"></td><td class="'.$hourCounter.' T"></td><td class="'.$hourCounter.' W">'.
+			'</td><td class="'.$hourCounter.' R"></td><td class="'.$hourCounter.' F"></td><td class="'.$hourCounter.' S"></td><td class="'.$hourCounter.' U"></td></tr>');
+		echo('<tr><td class ="'.$hourCounter.' 30 hourHeader"></td><td class="'.$hourCounter.'30 M"></td><td class="'.$hourCounter.'30 T"></td><td class="'.$hourCounter.'30 W">'.
+			'</td><td class="'.$hourCounter.'30 R"></td><td class="'.$hourCounter.'30 F"></td><td class="'.$hourCounter.'30 S"></td><td class="'.$hourCounter.'30 U"></td></tr>');
+	$hourCounter++;			
+	}
+	?>
+    <!--<tr><td class = "07">7am</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
     <tr><td class="30min"></td><td class="30min"></td><td class="30min"></td><td class="30min"></td><td class="30min"></td><td class="30min"></td><td class="30min"></td><td class="30min"></td></tr>
     <tr><td class = "08">8am</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
     <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
@@ -32,7 +55,7 @@
     <tr><td class = "20">8pm</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
     <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
     <tr><td class = "21">9pm</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-    <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>-->
    </table>
    </div>   
  <!--   //////////////////////// DIV CALENDAR IMPLEMENTATION ////////////////////////////////
