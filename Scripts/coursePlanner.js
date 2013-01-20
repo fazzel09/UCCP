@@ -460,6 +460,7 @@ $(document).ready(function(){
 		var height = duration/12 * hourHeight;
 		var left = $('.'+day).position().left+'px';
 		var top = (startIndex/12*hourHeight) +($('.07.M').position().top);
+		$('#selectionBox').remove();
 		$('.calendar table').append('<div id="selectionBox"></div>');
 		$('#selectionBox').css('top', top);
 		$('#selectionBox').css('left', left);
