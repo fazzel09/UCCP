@@ -109,6 +109,7 @@ body
 	box-shadow: 3px 3px 4px #000;
 }
 
+/* Original design selected courses 
 .selectedcourses
 {
 	float: left;
@@ -123,17 +124,15 @@ body
 	box-shadow: 3px 3px 4px #000;
 }
 
-.schedule
+*/
+
+/* New design selected courses */
+.selectedCourses
 {
-	float: right;
-	background-color:#0B5FA5;
-	margin:15px;
-	width:42%;
-	height:600px;
-	border-radius:15px;
-	padding:10px;
-	box-shadow: 3px 3px 4px #000;
-	position:relative;
+    width:95%;
+    height: 20%;
+    margin-left:auto;
+    margin-right:auto;
 }
 
 .courseRow
@@ -261,3 +260,75 @@ td
 {
 	display:none;	
 }
+
+/* ========== CALENDAR STYLING ============== */
+/* Old schedule wrapper (contained just the calendar)
+.schedule
+{
+	float: right;
+	background-color:#0B5FA5;
+	margin:15px;
+	width:42%;
+	height:600px;
+	border-radius:15px;
+	padding:10px;
+	box-shadow: 3px 3px 4px #000;
+	position:relative;
+}
+*/
+.schedule
+{
+    float:right;
+    background-color:White;
+    margin:10px;
+    width:70%;
+    height:100%;
+    border-radius:15px;
+	box-shadow: 3px 3px 4px #000;
+}
+#calendar
+{
+    float:right;
+    width:98%;
+    margin-left:1%;
+    margin-top:20px;
+    height:75%;
+}
+
+#calendar table
+{
+    border:1px solid black;
+    border-collapse: collapse;
+    font-size:12px;
+}
+
+#calendar tr
+{
+    text-align:center;
+	cursor:default;
+    height:18px;
+}
+
+#calendar td
+{
+    width:90px;
+    border-left:1px solid gray;
+    border-right:1px solid gray;
+    border-top:1px solid gray;
+}
+
+
+/* Specificity preventing the middle border from functioning correctly?  */
+#calendar td.30
+{
+    border-top:1px dashed gray;
+}
+
+#calendar td.00
+{
+    border-top:1px solid gray;
+}
+/* 
+	height:15px;
+    width:59px;
+*/

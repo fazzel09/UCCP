@@ -10,7 +10,6 @@
   
   <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
 <link rel="stylesheet" type="text/css" href="style.css" />
-<link rel="stylesheet" type="text/css" href="calendar_style.css" />
 <title>University of Cincinnati Course Planner
 </title>
 </head>
@@ -67,36 +66,27 @@ $DB -> connect();
         4. "Find Courses" button
         -->
         <div class="searchresults">
-        <div class="searchbar" style="display:none">Search for course name, department, college, etc..</div>
+            <h3>Find Classes</h3>
+            <div class="searchbar" style="display:none">Search for course name, department, college, etc..</div>
 
-		<input type="text" name="searchInput" id="searchBox">
-		<input type="button" id="mandatorySearch" value="">
+		    <input type="text" name="searchInput" id="searchBox">
+		    <input type="button" id="mandatorySearch" value="">
 		
-    	<h3>Results</h3>
-        <div id="results">
-        </div>
+
+            <div id="results"></div>
         </div>
 </div>
 	
-   
-	<div class="selectedcourses">
-    <h3>Selected Courses</h3>
-	</div>
-    
     <div class="schedule">
-    <?php require "calendar.php"; ?>
+        <div class="selectedcourses"></div>
+        
+        <?php require "calendar.php"; ?>
     
-    <div class="selectionOptions">
-        <button id="selectionSearch" value="selectionSearch">Find Courses</button>
-        <button id="cancelSelection" value="cancelSelection">Cancel</button>
+        <div class="selectionOptions">
+            <button id="selectionSearch" value="selectionSearch">Find Courses</button>
+            <button id="cancelSelection" value="cancelSelection">Cancel</button>
+        </div>
     </div>
-    
-    </div>
-    </div>
-		
-    
-	
-	
 </div>
 
 <div id="searchDialog">

@@ -1,6 +1,6 @@
-<div class="calendar">
+<div id="calendar">
 <!--     <tr><td class="30min"></td><td class="30min"></td><td class="30min"></td><td class="30min"></td><td class="30min"></td><td class="30min"></td><td class="30min"></td><td class="30min"></td></tr>
- --> Calendar Implementation
+ -->
    <table>
     <tr class='dayHeader'><td></td><td div class="M">Mon</td><td div class="T">Tue</td><td div class="W">Wed</td><td div class="R">Thu</td><td div class="F">Fri</td><td div class="S">Sat</td><td div class="U">Sun</td></tr>
     <?php
@@ -19,10 +19,10 @@
 		{
 			$hourString = $hourCounter.'am';	
 		}
-		echo('<tr><td class ="'.$hourCounter.' 00 hourHeader">'.$hourString.'</td><td class="'.$hourCounter.' M"></td><td class="'.$hourCounter.' T"></td><td class="'.$hourCounter.' W">'.
-			'</td><td class="'.$hourCounter.' R"></td><td class="'.$hourCounter.' F"></td><td class="'.$hourCounter.' S"></td><td class="'.$hourCounter.' U"></td></tr>');
-		echo('<tr><td class ="'.$hourCounter.' 30 hourHeader"></td><td class="'.$hourCounter.'30 M"></td><td class="'.$hourCounter.'30 T"></td><td class="'.$hourCounter.'30 W">'.
-			'</td><td class="'.$hourCounter.'30 R"></td><td class="'.$hourCounter.'30 F"></td><td class="'.$hourCounter.'30 S"></td><td class="'.$hourCounter.'30 U"></td></tr>');
+		echo('<tr><td class ="'.$hourCounter.' 00 hourHeader">'.$hourString.'</td><td class="'.$hourCounter.' M 00"></td><td class="'.$hourCounter.' T 00"></td><td class="'.$hourCounter.' W 00">'.
+             '</td><td class="'.$hourCounter.' R 00"></td><td class="'.$hourCounter.' F 00"></td><td class="'.$hourCounter.' S 00"></td><td class="'.$hourCounter.' U 00"></td></tr>');
+		echo('<tr><td class ="'.$hourCounter.' 30 hourHeader"></td><td class="'.$hourCounter.'30 M 30"></td><td class="'.$hourCounter.'30 T 30"></td><td class="'.$hourCounter.'30 W 30">'.
+            '</td><td class="'.$hourCounter.'30 R 30"></td><td class="'.$hourCounter.'30 F 30"></td><td class="'.$hourCounter.'30 S 30"></td><td class="'.$hourCounter.'30 U 30"></td></tr>');
 	$hourCounter++;			
 	}
 	?>

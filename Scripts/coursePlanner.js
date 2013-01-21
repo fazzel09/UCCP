@@ -461,7 +461,7 @@ $(document).ready(function(){
 		var left = $('.'+day).position().left+'px';
 		var top = (startIndex/12*hourHeight) +($('.07.M').position().top);
 		$('#selectionBox').remove();
-		$('.calendar table').append('<div id="selectionBox"></div>');
+		$('#calendar table').append('<div id="selectionBox"></div>');
 		$('#selectionBox').css('top', top);
 		$('#selectionBox').css('left', left);
 		$('#selectionBox').css('width', dayWidth);
@@ -498,7 +498,7 @@ $(document).ready(function(){
 	
 	function resetSelectionListeners()
 	{
-		$('.calendar').dblclick(function(e)
+		$('#calendar').dblclick(function(e)
 		{
 			var time = e.target.className.split(' ')[0];
 			var day = e.target.className.split(' ')[1];
@@ -516,7 +516,7 @@ $(document).ready(function(){
 		});
 		
 		
-		$('.calendar td').mousedown(function(e)
+		$('#calendar td').mousedown(function(e)
 		{
 			$('.selectionOptions').css('display', 'inline');
 			console.log('target: '+e.target.className);
@@ -536,7 +536,7 @@ $(document).ready(function(){
 			$('#selectionBox').css('width', dayWidth);
 			$('#selectionBox').css('height', '0');
 	
-			$('.calendar .'+target.className.split(' ')[1]+', #selectionBox').mousemove(function(e)
+			$('#calendar .'+target.className.split(' ')[1]+', #selectionBox').mousemove(function(e)
 			{
 				//console.log('target: ' + e.target.className);
 				var height = e.pageY - top;
@@ -552,10 +552,10 @@ $(document).ready(function(){
 				$('#selectionBox').css('height', height)
 			});
 			
-			$('.calendar td').mouseup(function(e)
+			$('#calendar td').mouseup(function(e)
 			{
 				searchEndTime = e.target.className.split(' ')[0];
-				$('#selectionBox, .calendar td, .calendar').unbind();
+				$('#selectionBox, #calendar td, #calendar').unbind();
 				console.log('mouseup '+e.target.className);
 				resetSelectionListeners();
 			});
