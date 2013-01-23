@@ -239,6 +239,10 @@ td
 	height: 18px;
 }
 
+#calendar{
+	position:relative;
+}
+
 .sectionBlock
 {
 	position:absolute;
@@ -247,18 +251,23 @@ td
 	opacity:.5;
 }
 
-#selectionBox
+.selectionBox
 {
 	background:red;
 	/*opacity:.25;*/
 	position:absolute;	
-		border-radius:10px;
+	border-radius:10px;
 	box-shadow: 3px 3px 4px #000;
 }
 
 .selectionOptions
 {
 	display:none;	
+}
+
+.dayHeader
+{
+	width: 90px;	
 }
 
 /* ========== CALENDAR STYLING ============== */
@@ -311,12 +320,19 @@ td
 
 #calendar td
 {
-    width:90px;
     border-left:1px solid gray;
     border-right:1px solid gray;
     border-top:1px solid gray;
 }
 
+.dayHeader
+{
+	width:90px;	
+}
+#calendar td :not(hourHeader)
+{
+	width:90px;	
+}
 
 /* Specificity preventing the middle border from functioning correctly?  */
 #calendar td.30

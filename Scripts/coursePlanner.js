@@ -71,7 +71,7 @@ $(document).ready(function(){
 				console.log("sectionSearch success");
 				generateArrays(data);
 				updateResultsList(data);
-				$('#selectionBox').remove();
+				$('.selectionBox').remove();
 				$('.selectionOptions').css('display','none');
 			},
 			error:function(xhr, ajaxOptions, thrownError)
@@ -92,7 +92,7 @@ $(document).ready(function(){
 	
 	$('#cancelSelection').click(function(e)
 	{
-		$('#selectionBox').remove();
+		$('.selectionBox').remove();
 		$('.selectionOptions').css('display','none');
 	});
 	
@@ -119,10 +119,8 @@ $(document).ready(function(){
 		var courseNum = null;
 		$.each(data, function(key,value)
 		{
-			
 			courseNum = value['courseNum'];
 			searchResults.push(new Course(value));
-
 		});
 	}
 
@@ -278,7 +276,9 @@ $(document).ready(function(){
 	
 	function addToCalendar(addedCourse)
 	{
-		var startPositionX = Math.round($('.'+addedCourse.startTime.hour).position().top + addedCourse.startTime.minute/60*hourHeight);
+		var startPositionY = Math.round(($('.'+addedCourse.startTime.hour).offset().top - $('#calendar').offset().top)+ addedCourse.startTime.minute/60*hourHeight);
+		var startPositionX = $('.'+addedCourseDay).offset().left - $('#calendar').offset().left
+		
 		var blockHeight=(addedCourse.duration.hours*hourHeight) + (addedCourse.duration.minutes/60*hourHeight);
 		
 		
@@ -288,13 +288,13 @@ $(document).ready(function(){
 		{	
 			var addedCourseDay = addedCourse.days[i];
 			
-			$('.schedule').append('<div class="sectionBlock '+addedCourse.callNum+' '+addedCourseDay+'"></div>');
+			$('#calendar').append('<div class="sectionBlock '+addedCourse.callNum+' '+addedCourseDay+'"></div>');
 			$('.sectionBlock.'+addedCourse.callNum+'.'+addedCourseDay).css('width',dayWidth);
 			$('.sectionBlock.'+addedCourse.callNum+'.'+addedCourseDay).css('height',blockHeight);
 			$('.sectionBlock.'+addedCourse.callNum+'.'+addedCourseDay).css('background-color',addedCourse.color);
-			$('.sectionBlock.'+addedCourse.callNum+'.'+addedCourseDay).css('top',startPositionX);
+			$('.sectionBlock.'+addedCourse.callNum+'.'+addedCourseDay).css('top',startPositionY);
 			console.log("course Day: "+$('.'+addedCourseDay).position());
-			$('.sectionBlock.'+addedCourse.callNum+'.'+addedCourseDay).css('left',$('.'+addedCourseDay).position().left+'px');
+			$('.sectionBlock.'+addedCourse.callNum+'.'+addedCourseDay).css('left',+'px');
 		}
 
 		//updateDisplay(addedCourse);
@@ -357,6 +357,12 @@ $(document).ready(function(){
 				case 'F':
 					operation(friday, variable, 'F');
 					break;
+				case 'S':
+					operation(saturday, variable, 'S');
+					break;
+				case 'U':
+					operation(sunday, variable, 'U');
+					break;
 				default:
 					break;		
 			}
@@ -372,7 +378,7 @@ $(document).ready(function(){
 			for(var j=0;j<curBlock.courses.length;j++)
 			{
 				$('.sectionBlock.'+curBlock.courses[j]+'.'+day).css('width',dayWidth/curBlock.courses.length);
-				$('.sectionBlock.'+curBlock.courses[j]+'.'+day).css('left',($('.'+day).position().left)+j*60/curBlock.courses.length+'px');
+				$('.sectionBlock.'+curBlock.courses[j]+'.'+day).css('left',($('.'+day).offset().left - $('#calendar').offset().left)+j*dayWidth/curBlock.courses.length+'px');
 			}		
 		}
 	}
@@ -427,6 +433,7 @@ $(document).ready(function(){
 	
 	function findFreeSlot(array, index, day)
 	{
+		console.log('Find free slot');
 		var startIndex = index;
 		var endIndex = index;
 		for(var i=index; i<array.length; i++)
@@ -460,12 +467,12 @@ $(document).ready(function(){
 		var height = duration/12 * hourHeight;
 		var left = $('.'+day).position().left+'px';
 		var top = (startIndex/12*hourHeight) +($('.07.M').position().top);
-		$('#selectionBox').remove();
-		$('#calendar table').append('<div id="selectionBox"></div>');
-		$('#selectionBox').css('top', top);
-		$('#selectionBox').css('left', left);
-		$('#selectionBox').css('width', dayWidth);
-		$('#selectionBox').css('height', height);
+		$('.selectionBox').remove();
+		$('#calendar').append('<div class="selectionBox '+day+'"></div>');
+		$('.selectionBox').css('top', top);
+		$('.selectionBox').css('left', left);
+		$('.selectionBox').css('width', dayWidth);
+		$('.selectionBox').css('height', height);
 		
 		searchDay = day;
 		var hour = Math.floor((startIndex/12) + 7) 
@@ -519,43 +526,43 @@ $(document).ready(function(){
 		$('#calendar td').mousedown(function(e)
 		{
 			$('.selectionOptions').css('display', 'inline');
-			console.log('target: '+e.target.className);
+			console.log('target: '+$(this).attr('class'));
 			var target = e.target;
 			
 			searchStartTime = e.target.className.split(' ')[0];
 			searchDay = e.target.className.split(' ')[1];
 			
-			var top = $(this).offset().top;
-			var left = $(this).offset().left;
-			$('#selectionBox').remove();
+			var top = $(this).offset().top - $('#calendar').offset().top;
+			var left = $(this).offset().left - $('#calendar').offset().left;
+			$('.selectionBox').remove();
 			
 			//console.log('append the selectionBox');
-			$('body').append('<div id="selectionBox"></div>');
-			$('#selectionBox').css('top', top);
-			$('#selectionBox').css('left', left);
-			$('#selectionBox').css('width', dayWidth);
-			$('#selectionBox').css('height', '0');
+			$('#calendar').append('<div class="selectionBox '+searchDay+'"></div>');
+			$('.selectionBox').css('top', top);
+			$('.selectionBox').css('left', left);
+			$('.selectionBox').css('width', dayWidth);
+			$('.selectionBox').css('height', '0');
 	
-			$('#calendar .'+target.className.split(' ')[1]+', #selectionBox').mousemove(function(e)
+			$('#calendar .'+target.className.split(' ')[1]+', .selectionBox').mousemove(function(e)
 			{
 				//console.log('target: ' + e.target.className);
-				var height = e.pageY - top;
+				var height = e.pageY - $('#calendar').offset().top - top;
 				if(height<0)
 				{
-					$('#selectionBox').css('top', top+height+2);
+					$('.selectionBox').css('top', top+height+2);
 					height = Math.abs(height) - 2;	
 				}
 				else
 				{
-					$('#selectionBox').css('top', top);	
+					$('.selectionBox').css('top', top);	
 				}
-				$('#selectionBox').css('height', height)
+				$('.selectionBox').css('height', height)
 			});
 			
 			$('#calendar td').mouseup(function(e)
 			{
 				searchEndTime = e.target.className.split(' ')[0];
-				$('#selectionBox, #calendar td, #calendar').unbind();
+				$('.selectionBox, #calendar td, #calendar').unbind();
 				console.log('mouseup '+e.target.className);
 				resetSelectionListeners();
 			});
@@ -572,13 +579,37 @@ $(document).ready(function(){
 		}
 		return color;
 	}
+	
+	$(window).resize(function(e)
+	{
+		console.log('Resize');
+		dayWidth = $('.T').position().left - $('.M').position().left;
+		
+		$('.selectionBox').css('width',dayWidth);
+		$('.selectionBox.M').css('left',$('.M').offset().left - $('#calendar').offset().left);
+		$('.selectionBox.T').css('left',$('.T').offset().left - $('#calendar').offset().left);
+		$('.selectionBox.W').css('left',$('.W').offset().left - $('#calendar').offset().left);
+		$('.selectionBox.R').css('left',$('.H').offset().left - $('#calendar').offset().left);
+		$('.selectionBox.F').css('left',$('.F').offset().left - $('#calendar').offset().left);
+		$('.selectionBox.S').css('left',$('.S').offset().left - $('#calendar').offset().left);
+		$('.selectionBox.U').css('left',$('.U').offset().left - $('#calendar').offset().left);
+		
+		checkConflicts(monday, null, 'M' );
+		checkConflicts(tuesday, null, 'T' );
+		checkConflicts(wednesday, null, 'W' );
+		checkConflicts(thursday, null, 'H' );
+		checkConflicts(friday, null, 'F' );
+		checkConflicts(saturday, null, 'S' );
+		checkConflicts(sunday, null, 'U' );
+		
+	});
 			
 	$('#searchDialog').dialog({
 		autoOpen:false,
 		modal:true,
 		height:200,
 		buttons:{ "Search":function(){console.log('Search');}, "Cancel":			function(){$(this).dialog("close");}},
-		close:function(){$('#selectionBox').remove();}
+		close:function(){$('.selectionBox').remove();}
 	});
 	
 	var searchStartTime;
@@ -588,7 +619,7 @@ $(document).ready(function(){
 	var searchResults = new Array();
 	var selectedCourses = new Array();
 	var hourHeight = $('.08').position().top - $('.07').position().top
-	var dayWidth = 60;
+	var dayWidth = $('.T').position().left - $('.M').position().left;
 	var colors = new Array('blue', 'red','orange','green','yellow','pink','purple');
 	var colorIndex = 0;
 	
@@ -597,6 +628,8 @@ $(document).ready(function(){
 	var wednesday = new Array();
 	var thursday = new Array();
 	var friday = new Array();
+	var saturday = new Array();
+	var sunday = new Array();
 	
 	for(var i=0;i<181;i++)
 	{
@@ -605,6 +638,8 @@ $(document).ready(function(){
 		wednesday[i]=new CalendarBlock(null);
 		thursday[i]=new CalendarBlock(null);
 		friday[i]=new CalendarBlock(null);
+		saturday[i]=new CalendarBlock(null);
+		sunday[i]=new CalendarBlock(null);
 	}
 	
 	var hour =12;
