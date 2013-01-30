@@ -143,6 +143,10 @@ body
 	background-color:#999;
 }
 
+.sectionRow
+{
+	max-width:300px;	
+}
 .sectionRow, .courseRow
 {
 	margin-left:10px;
@@ -153,37 +157,40 @@ body
 	cursor:default;
 }
 
-.sectionRow
+.sectionBlock, .sectionOverlay
+{
+	position:absolute;
+	border-radius:10px;
+	box-shadow: 3px 3px 4px #000;
+}
+.sectionBlock
+{
+	opacity:.5;
+}
+.selectedCourses .sectionRow
+{
+	width: 200px;
+	float:right;
+}
+
+#results .sectionRow
 {
 	float:right;
-	height:60px;
+	height:25px;
+	overflow:hidden;
 	background-color:#FFF;
-	width:200px;
+	width:90%;
 }
-.sectionInfo
+.sectionInfo, .courseNum
 {
 	float:left;	
 }
 
-.courseNum
-{
-	float:left;
-}
-
-#results .courseNum
-{
-	display:none;	
-}
-
-.selectedCourses .sectionInfo
+.selectedCourses .sectionInfo, #results .deleteSection, #results .courseNum
 {
 	display:none;
 }
 
-#results .deleteSection
-{
-	display: none;
-}
 
 .selectedCourses .deleteSection
 {
@@ -224,14 +231,17 @@ body
 .showSections
 {
 	float:right;
-	margin-top:30px;
-	font-size: 10px;
-	cursor: pointer;	
+	cursor: pointer;
+	height:20px;	
+	margin-top:2px;
+	margin-right:2px;
 }
 
 .courseInfo
 {
 	float: left;
+	height: 25px;
+	overflow:hidden;
 }
 
 td
@@ -241,14 +251,6 @@ td
 
 #calendar{
 	position:relative;
-}
-
-.sectionBlock
-{
-	position:absolute;
-	border-radius:10px;
-	box-shadow: 3px 3px 4px #000;
-	opacity:.5;
 }
 
 .selectionBox
@@ -306,6 +308,7 @@ td
 
 #calendar table
 {
+	width:98%;
     border:1px solid black;
     border-collapse: collapse;
     font-size:12px;
@@ -325,13 +328,15 @@ td
     border-top:1px solid gray;
 }
 
-.dayHeader
+.sectionOverlay
 {
-	width:90px;	
+	background-color:yellow;
+	position:absolute;
 }
-#calendar td :not(hourHeader)
+
+.sectionOverlay .deleteSection
 {
-	width:90px;	
+	display: none;	
 }
 
 /* Specificity preventing the middle border from functioning correctly?  */
@@ -348,3 +353,7 @@ td
 	height:15px;
     width:59px;
 */
+.S, .U, .selectedCourses
+{
+	display:None;
+}

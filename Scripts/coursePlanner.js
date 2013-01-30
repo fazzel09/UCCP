@@ -1,6 +1,65 @@
 $(document).ready(function(){
 	$('body').disableSelection();
 	
+	/* ----- Data types used for local course information ----- */
+	function Course(value)
+	{
+		this.courseName = value['CourseName'];
+		this.courseNum = value['courseNum'];	
+		this.courseName = value['CourseName'];
+		this.courseNum = value['courseNum'];	
+		this.callNum = value['callNum'];
+		this.section = value['sectNum'];
+		this.days = value['days'];
+		this.startTime = new Time( value['start_time']);
+		this.endTime = new Time( value['end_time']);
+		this.duration = new Duration(this.startTime, this.endTime);
+		this.color = null;
+		
+		// These are the rows in the search results list.
+		this.courseRow = '<div class="courseRow '+this.courseNum+'"><div class="courseInfo">'+this.courseNum+':'+this.courseName+'</div><img class="showSections '+this.courseNum
+			+'" id="showSections" src="Images/plus.png"><div class="sectionData '+this.courseNum+'"></div></div>';
+		this.sectionRow = '<div class="sectionRow '+this.callNum+'" ><div class="deleteSection '
+			+this.callNum+'">X</div><div class="courseNum">'+this.courseNum+'</div><div class="sectionInfo">'+this.days+':'+this.startTime.string+'-'+this.endTime.string+' Instructor here</div></div>';
+			
+		// This is the blocks displayed over the calendar
+		this.sectionBlock = '<div class="deleteSection '+this.callNum+'">X</div><div class="courseNum">'+this.courseNum+'</div>';
+	}
+	
+	function Time(value)
+	{
+		var parsed = value.split(':');
+		this.hour = parsed[0];
+		this.minute = parsed[1];
+		if(this.hour > 12)
+		{
+			this.hourString = this.hour-12;
+		}
+		else
+		{
+			this.hourString = this.hour;	
+		}
+		this.string = this.hourString+':'+this.minute;
+	}
+
+	function Duration(start, end)
+	{
+		this.hours = end.hour-start.hour;
+		this.minutes = end.minute-start.minute;
+		
+		if(this.hours < 0)
+		{
+			this.hours = this.hours+12;
+		}
+		if(this.minutes < 0)
+		{
+			this.hours = this.hours-1;
+			this.minutes = this.minutes + 60;
+		}
+	}
+	
+	
+	/* ----- search Functions -----*/
 	$('#mandatorySearch').click(function(){
 		$.ajax({
 			type:'POST',
@@ -90,29 +149,20 @@ $(document).ready(function(){
 		});
 	});
 	
+	
+	/* ----- Selection functions, picking time slots on Calendar ----- */
+	
+	/* Removes the selection box when cancel is clicked. */
 	$('#cancelSelection').click(function(e)
 	{
 		$('.selectionBox').remove();
 		$('.selectionOptions').css('display','none');
 	});
 	
-	function toggleSections( className )
-	{
-		if($('.sectionData.'+className).is(':visible'))
-		{
-			console.log("It's visible");
-			$(".sectionData."+className).hide();
-			$('.showSections.'+className).html('Show Sections');	
-		}
-		else
-		{
-			console.log('Not Visible');
-			$(".sectionData."+className).show();
-			$('.showSections.'+className).html('Hide Sections');	
-		}
-		console.log('class name ' + className);
-	}
+	
+	/*Search results functions: formatting, switching displays, etc */
 
+	/*Add a new course to the search results array*/
 	function generateArrays(data)
 	{
 		searchResults = new Array();
@@ -124,60 +174,7 @@ $(document).ready(function(){
 		});
 	}
 
-	function Course(value)
-	{
-		this.courseName = value['CourseName'];
-		this.courseNum = value['courseNum'];	
-		this.courseName = value['CourseName'];
-		this.courseNum = value['courseNum'];	
-		this.callNum = value['callNum'];
-		this.section = value['sectNum'];
-		this.days = value['days'];
-		this.startTime = new Time( value['start_time']);
-		this.endTime = new Time( value['end_time']);
-		this.duration = new Duration(this.startTime, this.endTime);
-		this.color = null;
-		
-		this.courseRow = '<div class="courseRow '+this.courseNum+'"><div class="courseInfo">'
-			+this.courseName+'<br>'+this.courseNum+'</div><div class="showSections '+this.courseNum
-			+'" id="showSections">Show Sections</div><div class="sectionData '+this.courseNum+'"></div></div>';
-		this.sectionRow = '<div class="sectionRow '+this.callNum+'" ><div class="deleteSection '
-			+this.callNum+'">X</div><div class="courseNum">'+this.courseNum+'</div><div class="sectionInfo">Section: '
-			+this.section+' Call: '+this.callNum+'</div></br>'+this.days+'\t'+
-			this.startTime.string+'-'+this.endTime.string+'</div>';
-	}
-	
-	function Time(value)
-	{
-		var parsed = value.split(':');
-		this.hour = parsed[0];
-		this.minute = parsed[1];
-		if(this.hour > 12)
-		{
-			this.hourString = this.hour-12;
-		}
-		else
-		{
-			this.hourString = this.hour;	
-		}
-		this.string = this.hourString+':'+this.minute;
-	}
-
-	function Duration(start, end)
-	{
-		this.hours = end.hour-start.hour;
-		this.minutes = end.minute-start.minute;
-		
-		if(this.hours < 0)
-		{
-			this.hours = this.hours+12;
-		}
-		if(this.minutes < 0)
-		{
-			this.hours = this.hours-1;
-			this.minutes = this.minutes + 60;
-		}
-	}
+	/*Replaces the previous results list with the most recent results */
 	function updateResultsList(data)
 	{
 		$('#results').html("");
@@ -201,13 +198,22 @@ $(document).ready(function(){
 			}
 		}
 		$(".sectionData").hide();
-		$('.showSections').click(function(event){
+		
+		$('.showSections').toggle(
+		function(event){
+			$(".sectionData."+event.target.className.split(' ')[1]).show();
+			$(this).attr({src:"Images/minus.png"});
 			
-			toggleSections(event.target.className.split(' ')[1]);
+		},
+		function(event){
+			$(".sectionData."+event.target.className.split(' ')[1]).hide();
+			$(this).attr({src:"Images/plus.png"});	
+			
 		});
 		makeDraggable();
 	}
 
+	/* Make the course row draggable */
 	function makeDraggable(){
 		
 		$('.sectionRow').draggable({
@@ -220,8 +226,23 @@ $(document).ready(function(){
 		{
 			console.log('DblClick: '+$(this).attr('class'));
 			addSection($(this).attr('class').split(' ')[1]);
+			$('.sectionOverlay').remove();
 		});
 		
+		$('#results .sectionRow').hover(
+		function(e)
+		{
+			console.log('Hover');
+			displaySectionOverlay($(this).attr('class').split(' ')[1]);
+		},
+		function(e)
+		{
+			console.log('HoverOut');
+			$('.sectionOverlay').remove();
+		});
+		
+		
+		//If we already selected this course, make it not draggable.
 		for(var i=0; i<selectedCourses.length; i++)
 		{
 			$('#results .sectionRow.'+selectedCourses[i].callNum).draggable('disable');	
@@ -239,19 +260,49 @@ $(document).ready(function(){
 		});
 	};
 	
-	function addSection(callNum)
+	function findCourse(callNum)
 	{
-		//Find the course corresponding with this callnum
 		for(var i=0;i<searchResults.length; i++)
 		{
 			if(searchResults[i].callNum == callNum)
 			{
 				console.log('course found');
-				var course = searchResults[i];
-				break;
+				return searchResults[i];
 			}
 		}
+		return null;
+	}
+	
+	function displaySectionOverlay(callNum)
+	{
+		var addedCourse = findCourse(callNum);
 		
+		var startPositionY = Math.round(($('.'+addedCourse.startTime.hour).offset().top - $('#calendar').offset().top)+ addedCourse.startTime.minute/60*hourHeight);
+		
+		
+		var blockHeight=(addedCourse.duration.hours*hourHeight) + (addedCourse.duration.minutes/60*hourHeight);
+		
+		//For each day the section is on, compute the width
+		for(var i=0;i<addedCourse.days.length;i++)
+		{	
+			var addedCourseDay = addedCourse.days[i];
+			var startPositionX = $('.'+addedCourseDay).offset().left - $('#calendar').offset().left
+			
+			$('#calendar').append('<div class="sectionOverlay '+addedCourse.callNum+' '+addedCourseDay+'">'+addedCourse.sectionBlock+'</div>');
+			$('.sectionOverlay.'+addedCourse.callNum+'.'+addedCourseDay).css('width',dayWidth);
+			$('.sectionOverlay.'+addedCourse.callNum+'.'+addedCourseDay).css('height',blockHeight);
+			$('.sectionOverlay.'+addedCourse.callNum+'.'+addedCourseDay).css('top',startPositionY);
+			$('.sectionOverlay.'+addedCourse.callNum+'.'+addedCourseDay).css('left', startPositionX);
+		}
+	}
+	
+	//Add a section to the calendar
+	function addSection(callNum)
+	{
+		//Find the course corresponding with this callnum
+		var course = findCourse(callNum);
+		
+		//If the course doesn't already exist, add the course to the selected Courses box.
 		if(!$('.selectedcourses .sectionRow.'+callNum).is('*'))
 		{
 			console.log('Adding double clicked section');
@@ -288,7 +339,7 @@ $(document).ready(function(){
 		{	
 			var addedCourseDay = addedCourse.days[i];
 			
-			$('#calendar').append('<div class="sectionBlock '+addedCourse.callNum+' '+addedCourseDay+'"></div>');
+			$('#calendar').append('<div class="sectionBlock '+addedCourse.callNum+' '+addedCourseDay+'">'+addedCourse.sectionBlock+'</div>');
 			$('.sectionBlock.'+addedCourse.callNum+'.'+addedCourseDay).css('width',dayWidth);
 			$('.sectionBlock.'+addedCourse.callNum+'.'+addedCourseDay).css('height',blockHeight);
 			$('.sectionBlock.'+addedCourse.callNum+'.'+addedCourseDay).css('background-color',addedCourse.color);
@@ -297,9 +348,10 @@ $(document).ready(function(){
 			$('.sectionBlock.'+addedCourse.callNum+'.'+addedCourseDay).css('left',+'px');
 		}
 
-		//updateDisplay(addedCourse);
 		updateDayArrays(addedCourse.days, addedCourse.callNum, checkConflicts);
 	};
+	
+	/* add a new course to the approprate Day Array */
 	function addCourseToDayArray(array, course, notUsed)
 	{
 		var startHour = course.startTime.hour;
@@ -309,14 +361,11 @@ $(document).ready(function(){
 		
 		for(var i=startIndex; i<=endIndex; i++)
 		{
-			addCourse(course.callNum, array[i]);	
+			array[i].courses.push(course.callNum);
+				
 		}
 	}
 	
-	function addCourse(callNum, calendarBlock)
-	{
-		calendarBlock.courses.push(callNum);	
-	}
 	function outputCourseDayArrays()
 	{
 		for(var i=0; i<monday.length; i++)
@@ -407,6 +456,7 @@ $(document).ready(function(){
 		{
 			console.log('DblClick: '+$(this).attr('class'));
 			addSection($(this).attr('class').split(' ')[1]);
+			$('.sectionOverlay').remove();
 		});
 		
 		for(var i=0; i<selectedCourses.length; i++)
@@ -469,6 +519,7 @@ $(document).ready(function(){
 		var top = (startIndex/12*hourHeight) +($('.07.M').position().top);
 		$('.selectionBox').remove();
 		$('#calendar').append('<div class="selectionBox '+day+'"></div>');
+		$('.selectionBox').show('slow');
 		$('.selectionBox').css('top', top);
 		$('.selectionBox').css('left', left);
 		$('.selectionBox').css('width', dayWidth);
@@ -525,7 +576,6 @@ $(document).ready(function(){
 		
 		$('#calendar td').mousedown(function(e)
 		{
-			$('.selectionOptions').css('display', 'inline');
 			console.log('target: '+$(this).attr('class'));
 			var target = e.target;
 			
@@ -536,16 +586,16 @@ $(document).ready(function(){
 			var left = $(this).offset().left - $('#calendar').offset().left;
 			$('.selectionBox').remove();
 			
-			//console.log('append the selectionBox');
+			console.log('append the selectionBox');
 			$('#calendar').append('<div class="selectionBox '+searchDay+'"></div>');
 			$('.selectionBox').css('top', top);
 			$('.selectionBox').css('left', left);
 			$('.selectionBox').css('width', dayWidth);
 			$('.selectionBox').css('height', '0');
 	
-			$('#calendar .'+target.className.split(' ')[1]+', .selectionBox').mousemove(function(e)
+			$('#calendar .'+searchDay+', .selectionBox').mousemove(function(e)
 			{
-				//console.log('target: ' + e.target.className);
+				console.log('target: ' + e.target.className);
 				var height = e.pageY - $('#calendar').offset().top - top;
 				if(height<0)
 				{
@@ -558,11 +608,23 @@ $(document).ready(function(){
 				}
 				$('.selectionBox').css('height', height)
 			});
+
+			$('# calendar td').mouseover(function(e)
+			{
+				searchEndTime = e.target.className.split(' ')[0];
+			});
 			
 			$('#calendar td').mouseup(function(e)
 			{
 				searchEndTime = e.target.className.split(' ')[0];
-				$('.selectionBox, #calendar td, #calendar').unbind();
+				$('.selectionBox, #calendar td, #calendar, #calendar .'+searchDay+', .sectionBlock').unbind();
+				console.log('mouseup '+e.target.className);
+				resetSelectionListeners();
+			});
+			
+			$('.sectionBlock').mouseover(function(e)
+			{
+				$('.selectionBox, #calendar td, #calendar, #calendar .'+searchDay+', .sectionBlock').unbind();
 				console.log('mouseup '+e.target.className);
 				resetSelectionListeners();
 			});
@@ -608,6 +670,7 @@ $(document).ready(function(){
 		autoOpen:false,
 		modal:true,
 		height:200,
+		resizable:false,
 		buttons:{ "Search":function(){console.log('Search');}, "Cancel":			function(){$(this).dialog("close");}},
 		close:function(){$('.selectionBox').remove();}
 	});
@@ -620,8 +683,6 @@ $(document).ready(function(){
 	var selectedCourses = new Array();
 	var hourHeight = $('.08').position().top - $('.07').position().top
 	var dayWidth = $('.T').position().left - $('.M').position().left;
-	var colors = new Array('blue', 'red','orange','green','yellow','pink','purple');
-	var colorIndex = 0;
 	
 	var monday = new Array();
 	var tuesday = new Array();
