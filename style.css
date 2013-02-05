@@ -92,6 +92,38 @@ body
 	box-shadow: 3px 3px 4px #000;
 }
 
+#filters
+{
+	padding:0px;
+	margin:0px;
+	display:block;
+
+}
+
+.oneFilter
+{
+	background-color:grey;
+	float:left;
+	padding:3px;
+	overflow:hidden;
+	text-align:left;
+	border-radius:5px;
+	margin:5px;
+	box-shadow: 1px 1px 1px #000;	
+	line-height: 1em;
+}
+
+.oneFilter .delete
+{
+	text-align:right;
+	display:block;
+	font-size:10px;
+	top:0px;
+	
+}
+
+.clearBoth { clear:both; }
+
 .searchresults
 {
 	float:left;

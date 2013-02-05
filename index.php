@@ -67,14 +67,16 @@ $DB -> connect();
         4. "Find Courses" button
         -->
         <div class="searchresults">
-        <div class="searchbar" style="display:none">Search for course name, department, college, etc..</div>
+			<div class="searchbar" style="display:none">Search for course name, department, college, etc..</div>
 
-		<input type="text" name="searchInput" id="searchBox">
-		<input type="button" id="mandatorySearch" value="">
+			<input type="text" name="searchInput" id="searchBox">
+			<input type="button" id="mandatorySearch" value="">
+			<div id="filters">
+			</div>
+			
+			<div id="results">
+			</div>
 		
-    	<h3>Results</h3>
-        <div id="results">
-        </div>
         </div>
 </div>
 	

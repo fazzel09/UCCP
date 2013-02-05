@@ -71,7 +71,7 @@ $(document).ready(function(){
 			success:function(data){
 				console.log("Success");
 				generateArrays(data);
-				
+				addFilter($('#searchBox').val());
 				updateResultsList(data);
 
 			},
@@ -130,6 +130,7 @@ $(document).ready(function(){
 				console.log("sectionSearch success");
 				generateArrays(data);
 				updateResultsList(data);
+				
 				$('.selectionBox').remove();
 				$('.selectionOptions').css('display','none');
 			},
@@ -149,6 +150,12 @@ $(document).ready(function(){
 		});
 	});
 	
+	/* Adding a filter to the search */
+	function addFilter( filter )
+	{
+		console.log("adding filter");
+		$('#filters').append('<div class="oneFilter" id="filter-'+filter+'">'+filter+'</div>');
+	}
 	
 	/* ----- Selection functions, picking time slots on Calendar ----- */
 	
