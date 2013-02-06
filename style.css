@@ -111,15 +111,24 @@ body
 	margin:5px;
 	box-shadow: 1px 1px 1px #000;	
 	line-height: 1em;
+	display:inline;
 }
 
-.oneFilter .delete
+
+
+.deleteFilter
 {
 	text-align:right;
-	display:block;
-	font-size:10px;
-	top:0px;
-	
+	display:inline;
+	font-size:9px;
+	margin-top:0px;
+	margin-right:0px;
+	padding-right: 0px;
+	position:relative;
+	top:-6px;
+	right:-1px;
+	cursor: pointer;
+
 }
 
 .clearBoth { clear:both; }
@@ -258,6 +267,8 @@ body
 	height:15px;
 	display:none;
 	text-align:right;
+	cursor: pointer;
+	display:block;
 }
 
 .showSections

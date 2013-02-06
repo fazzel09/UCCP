@@ -58,6 +58,7 @@ $(document).ready(function(){
 		}
 	}
 	
+	var filters = new Array()
 	
 	/* ----- search Functions -----*/
 	$('#mandatorySearch').click(function(){
@@ -154,7 +155,14 @@ $(document).ready(function(){
 	function addFilter( filter )
 	{
 		console.log("adding filter");
+		// need to add to the filters array as well
 		$('#filters').append('<div class="oneFilter" id="filter-'+filter+'">'+filter+'</div>');
+		$('#filter-'+filter).append('<div class="deleteFilter">X</div>');
+		$('#filter-'+filter).find('.deleteFilter').click(function(e)
+			{
+				$('#filter-'+filter).remove();
+				//need to remove from the filters array as well.
+			});
 	}
 	
 	/* ----- Selection functions, picking time slots on Calendar ----- */
