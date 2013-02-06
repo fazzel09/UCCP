@@ -6,8 +6,6 @@ $(document).ready(function(){
 	{
 		this.courseName = value['CourseName'];
 		this.courseNum = value['courseNum'];	
-		this.courseName = value['CourseName'];
-		this.courseNum = value['courseNum'];	
 		this.callNum = value['callNum'];
 		this.section = value['sectNum'];
 		this.days = value['days'];
@@ -18,9 +16,17 @@ $(document).ready(function(){
 		
 		// These are the rows in the search results list.
 		this.courseRow = '<div class="courseRow '+this.courseNum+'"><div class="courseInfo">'+this.courseNum+':'+this.courseName+'</div><img class="showSections '+this.courseNum
-			+'" id="showSections" src="Images/plus.png"><div class="sectionData '+this.courseNum+'"></div></div>';
+			+'" id="showSections" ><div class="sectionData '+this.courseNum+'"></div></div>';
 		this.sectionRow = '<div class="sectionRow '+this.callNum+'" ><div class="deleteSection '
-			+this.callNum+'">X</div><div class="courseNum">'+this.courseNum+'</div><div class="sectionInfo">'+this.days+':'+this.startTime.string+'-'+this.endTime.string+' Instructor here</div></div>';
+			+this.callNum+'">X</div><div class="courseNum">'+this.courseNum+'</div><div class="sectionInfo">'+this.days+':'+this.startTime.string+'-'+this.endTime.string+' Instructor here</div><img class="sectionAddButton '+this.callNum+'"></div>';
+		
+		//The detailed information that goes into the popover when you mouse over a section on the calendar.	
+		this.detailedSectionInfo = '<table>'
+			+'<tr><td>Course Number</td><td>'+this.courseNum+'</td></tr>'
+			+'<tr><td>Call Number</td><td>'+this.callNum+'</td></tr>'
+			+'<tr><td>Days</td><td>'+this.days+'</td></tr>'
+			+'<tr><td>Times</td><td>'+this.startTime.string+'-'+this.endTime.string+'</td></tr>'
+			+'</table>';
 			
 		// This is the blocks displayed over the calendar
 		this.sectionBlock = '<div class="deleteSection '+this.callNum+'">X</div><div class="courseNum">'+this.courseNum+'</div>';
@@ -205,11 +211,13 @@ $(document).ready(function(){
 				courseNum = curRow.courseNum;
 				$('#results').append(curRow.courseRow);
 				$('.sectionData.'+courseNum).append(curRow.sectionRow);
+				setSectionRowListeners(curRow.callNum);
 			}
 			else
 			{
 				//add a section row
 				$('.sectionData.'+courseNum).append(curRow.sectionRow);
+				setSectionRowListeners(curRow.callNum);
 			}
 		}
 		$(".sectionData").hide();
@@ -217,34 +225,53 @@ $(document).ready(function(){
 		$('.showSections').toggle(
 		function(event){
 			$(".sectionData."+event.target.className.split(' ')[1]).show();
-			$(this).attr({src:"Images/minus.png"});
+			$(this).toggleClass('expanded');
 			
 		},
 		function(event){
 			$(".sectionData."+event.target.className.split(' ')[1]).hide();
-			$(this).attr({src:"Images/plus.png"});	
+			$(this).toggleClass('expanded');
 			
 		});
-		makeDraggable();
 	}
 
-	/* Make the course row draggable */
-	function makeDraggable(){
+	function setSectionRowListeners(callNum){
+		console.log("Setting them now Honkey");
+		//If we already selected this course, make it not draggable.
+		for(var i=0; i<selectedCourses.length; i++)
+		{
+			if(callNum = selectedCourses[i].callNum)
+			{
+				console.log("Shit is already added");
+				return
+			}
+		}
 		
-		$('.sectionRow').draggable({
+		var row = $('#results .sectionRow.'+callNum);
+/*		row.draggable({
 			//revert:true,
 			helper:'clone',
 			connectToSortable: '.selectedcourses',
-		});
+		});*/
 		
-		$('#results .sectionRow').dblclick(function(e)
+		//console.log('enable dragging on the row')
+		//row.draggable('enable');
+		
+		$('.sectionAddButton.'+callNum).attr('cursor', 'pointer');
+		
+		row.dblclick(function(e)
 		{
 			console.log('DblClick: '+$(this).attr('class'));
 			addSection($(this).attr('class').split(' ')[1]);
-			$('.sectionOverlay').remove();
 		});
 		
-		$('#results .sectionRow').hover(
+		row.click(function(e)
+		{
+			addSection($(this).attr('class').split(' ')[1]);
+		});
+		
+		//Shows the section overlay on the calendar when we hover over a section.
+		row.hover(
 		function(e)
 		{
 			console.log('Hover');
@@ -255,15 +282,8 @@ $(document).ready(function(){
 			console.log('HoverOut');
 			$('.sectionOverlay').remove();
 		});
-		
-		
-		//If we already selected this course, make it not draggable.
-		for(var i=0; i<selectedCourses.length; i++)
-		{
-			$('#results .sectionRow.'+selectedCourses[i].callNum).draggable('disable');	
-		}
-	
-		$('.selectedcourses').sortable({
+
+/*		$('.selectedcourses').sortable({
 			receive: function(event, ui){
 				console.log('Section Recieved: ' + ui.item.attr('class'));
 				
@@ -272,9 +292,10 @@ $(document).ready(function(){
 				addSection(callNum)
 
 			}
-		});
+		});*/
 	};
 	
+	//Search the selected courses for a given callNum.
 	function findCourse(callNum)
 	{
 		for(var i=0;i<searchResults.length; i++)
@@ -314,6 +335,7 @@ $(document).ready(function(){
 	//Add a section to the calendar
 	function addSection(callNum)
 	{
+		$('.sectionOverlay').remove();
 		//Find the course corresponding with this callnum
 		var course = findCourse(callNum);
 		
@@ -325,10 +347,13 @@ $(document).ready(function(){
 		}
 		
 		course.color = getRandomColor();
-		
-		$('.selectedcourses .sectionRow.'+callNum).css('background-color', course.color);
-		$('.sectionRow.'+callNum).draggable('disable');
+	
+		$('.selectedcourses .sectionRow.'+callNum).css('background', 'rgba('+course.color+')');
+		//$('.sectionRow.'+callNum).draggable('disable');
 		$('#results .'+callNum).unbind();
+		$('.sectionAddButton.'+callNum).unbind()
+		$('.sectionRow.'+callNum).attr('cursor', 'default');
+		$('.sectionRow.'+callNum).toggleClass('disabled', true);
 		
 		addToCalendar(course);
 		selectedCourses.push(course);
@@ -357,13 +382,31 @@ $(document).ready(function(){
 			$('#calendar').append('<div class="sectionBlock '+addedCourse.callNum+' '+addedCourseDay+'">'+addedCourse.sectionBlock+'</div>');
 			$('.sectionBlock.'+addedCourse.callNum+'.'+addedCourseDay).css('width',dayWidth);
 			$('.sectionBlock.'+addedCourse.callNum+'.'+addedCourseDay).css('height',blockHeight);
-			$('.sectionBlock.'+addedCourse.callNum+'.'+addedCourseDay).css('background-color',addedCourse.color);
+			$('.sectionBlock.'+addedCourse.callNum+'.'+addedCourseDay).css('background','rgba('+addedCourse.color+')');
 			$('.sectionBlock.'+addedCourse.callNum+'.'+addedCourseDay).css('top',startPositionY);
 			console.log("course Day: "+$('.'+addedCourseDay).position());
 			$('.sectionBlock.'+addedCourse.callNum+'.'+addedCourseDay).css('left',+'px');
 		}
 
 		updateDayArrays(addedCourse.days, addedCourse.callNum, checkConflicts);
+		
+		//Add a listener on the section block on the calendar to overlay detailed section info.
+		$('.sectionBlock').hover(
+				function(e)
+		{
+			console.log('Hover: '+$(this).attr('class'));
+			var course = findCourse($(this).attr('class').split(' ')[1]);
+			
+			$('#sectionInfoDialog').dialog( "option", "title", course.courseName);
+			$('#sectionInfoDialog').html(course.detailedSectionInfo);
+			$('#sectionInfoDialog').dialog('open');
+			$('#sectionInfoDialog').dialog( "option", "position", [e.pageX+20,e.pageY+20] );
+		},
+		function(e)
+		{
+			console.log('HoverOut');
+			$('#sectionInfoDialog').dialog('close');
+		});
 	};
 	
 	/* add a new course to the approprate Day Array */
@@ -464,15 +507,9 @@ $(document).ready(function(){
 
 	function deleteSelectedCourse(callNum)
 	{
-		$('.selectedcourses .sectionRow.'+callNum).remove();
-		$('.sectionBlock.'+callNum).remove();
-		$('.sectionRow.'+callNum).draggable('enable');
-		$('#results .'+callNum).dblclick(function(e)
-		{
-			console.log('DblClick: '+$(this).attr('class'));
-			addSection($(this).attr('class').split(' ')[1]);
-			$('.sectionOverlay').remove();
-		});
+		$('.selectedcourses .sectionRow.'+callNum+', .sectionBlock.'+callNum).remove();
+		//$('.sectionBlock.'+callNum).remove();
+		$('.sectionRow.'+callNum).toggleClass('disabled', false);
 		
 		for(var i=0; i<selectedCourses.length; i++)
 		{
@@ -484,7 +521,7 @@ $(document).ready(function(){
 		}
 		updateDayArrays('MTWRF', callNum, removeCourseFromDayArray);
 		updateDayArrays('MTWRF', callNum, checkConflicts);
-		
+		setSectionRowListeners(callNum);
 	};
 	
 	function outputSelectedCourses()
@@ -534,7 +571,6 @@ $(document).ready(function(){
 		var top = (startIndex/12*hourHeight) +($('.07.M').position().top);
 		$('.selectionBox').remove();
 		$('#calendar').append('<div class="selectionBox '+day+'"></div>');
-		$('.selectionBox').show('slow');
 		$('.selectionBox').css('top', top);
 		$('.selectionBox').css('left', left);
 		$('.selectionBox').css('width', dayWidth);
@@ -569,26 +605,27 @@ $(document).ready(function(){
 		console.log('startTime: '+searchStartTime+', '+searchEndTime);
 	}
 	
-	function resetSelectionListeners()
+	$('#calendar table').dblclick(function(e)
 	{
-		$('#calendar').dblclick(function(e)
+		console.log('doubleClick');
+		var time = e.target.className.split(' ')[0];
+		var day = e.target.className.split(' ')[1];
+		if(time.length == 2)
 		{
-			var time = e.target.className.split(' ')[0];
-			var day = e.target.className.split(' ')[1];
-			if(time.length == 2)
-			{
-				var index = (time - 7) * 12;
-			}
-			else
-			{
-				var index = ((time.slice(0,2)-7)*12) + 6;	
-			}
-			
-			updateDayArrays(day, index, findFreeSlot)
-			console.log('start time: '+time+', day: '+day+', index: '+index);	
-		});
+			var index = (time - 7) * 12;
+		}
+		else
+		{
+			var index = ((time.slice(0,2)-7)*12) + 6;	
+		}
 		
-		
+		updateDayArrays(day, index, findFreeSlot)
+		console.log('start time: '+time+', day: '+day+', index: '+index);	
+	});
+	
+	//Reset the listeners that display the selection box over the calendar. This must be done after a selection, to be ready for the next selection.
+	function resetSelectionListeners()
+	{		
 		$('#calendar td').mousedown(function(e)
 		{
 			console.log('target: '+$(this).attr('class'));
@@ -646,14 +683,16 @@ $(document).ready(function(){
 		});
 	}
 	
-	resetSelectionListeners();
+	
 				
 	function getRandomColor() {
 		var letters = '0123456789ABCDEF'.split('');
-		var color = '#';
-		for (var i = 0; i < 6; i++ ) {
-			color += letters[Math.round(Math.random() * 15)];
+		var color = '';
+		for (var i = 0; i < 3; i++ ) {
+			color += Math.round(Math.random() * 255)+', ';
 		}
+		color += '.5'
+		console.log('Color'+color);
 		return color;
 	}
 	
@@ -684,10 +723,17 @@ $(document).ready(function(){
 	$('#searchDialog').dialog({
 		autoOpen:false,
 		modal:true,
-		height:200,
+		height:150,
 		resizable:false,
 		buttons:{ "Search":function(){console.log('Search');}, "Cancel":			function(){$(this).dialog("close");}},
 		close:function(){$('.selectionBox').remove();}
+	});
+	
+	$('#sectionInfoDialog').dialog({
+		autoOpen:false,
+		modal:false,
+		height:200,
+		resizable:false
 	});
 	
 	var searchStartTime;
@@ -721,4 +767,6 @@ $(document).ready(function(){
 	var hour =12;
 	var halfHour = 6;
 	var quarterHour = 3;
+	
+	resetSelectionListeners();
 });

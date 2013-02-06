@@ -96,7 +96,7 @@ $DB -> connect();
     </div>
     </div>
 		
-    
+    <
 	
 	
 </div>
@@ -105,6 +105,10 @@ $DB -> connect();
 	Times: <input type="text" name="times" id="selectionSearchTimes"><br/>
     Days: <input type="text" id="selectionSearchDays" name="days"><br/>
     <input type="button" id="selectionSearch" value="search">
+</div>
+
+<div id="sectionInfoDialog">
+
 </div>
 
 </body>
