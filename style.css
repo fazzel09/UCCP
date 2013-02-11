@@ -140,7 +140,7 @@ body
 	margin-right:auto;
 	background-color:#0B5FA5;
 	margin:15px;
-	width:23%;
+	width:25%;
 	height:auto;
 	min-height: 500px;
 	line-height: 2em;
@@ -178,10 +178,11 @@ body
 
 .courseRow
 {
-	width:96%;
+	width:93%;
 	float:left;
 	height:auto;
 	background-color:#999;
+	padding:5px;
 }
 
 .sectionInfo
@@ -196,6 +197,7 @@ body
 	margin:5px;
 	box-shadow: 3px 3px 4px #000;	
 	cursor:default;
+	padding:5px;
 }
 
 .sectionBlock, .sectionOverlay
@@ -204,6 +206,8 @@ body
 	border-radius:10px;
 	box-shadow: 3px 3px 4px #000;
 	overflow:hidden;
+	padding:5px;
+	text-align:center;
 }
 /*.sectionBlock
 {
@@ -226,6 +230,11 @@ body
 .sectionInfo, .courseNum
 {
 	float:left;	
+}
+
+.schedule .courseNum
+{
+    font-weight:bold;
 }
 
 .selectedCourses .sectionInfo, #results .deleteSection, #results .courseNum
@@ -339,8 +348,8 @@ td
 .schedule
 {
     float:right;
-    background-color:White;
-    margin:10px;
+	background-color:#0B5FA5;
+    margin:15px;
     width:70%;
     border-radius:15px;
 	box-shadow: 3px 3px 4px #000;

@@ -24,7 +24,7 @@ $DB -> connect();
 
 <div class="mainwrapper">
 	<div class="menu">
-		MenuTest | Items | Are | Here | Don't | Click | Or | You'll | Explode |<a href="admin.php"> Admin page</a>
+		<a href="admin.php"> Admin page</a>
 	</div>
 
 	<div class="midwrapper">
@@ -52,53 +52,37 @@ $DB -> connect();
 		year
 	</div>
     -->
-
-    
-
-	
-
-   
-<div id="calendar_find_courses">
-        <!--
-        1. Search Bar (span) - Name, Department, College, Course Number 
-        //As one is selected, add it by name (ex: Name: Intro to CS or Department: "Computer Science")
-        2. Course Level (Multi-select drag+color)
-        3. BoK Category
-        4. "Find Courses" button
-        -->
-        <div class="searchresults">
-			<div class="searchbar" style="display:none">Search for course name, department, college, etc..</div>
-
-			<input type="text" name="searchInput" id="searchBox">
-			<input type="button" id="mandatorySearch" value="">
-			<div id="filters">
-			</div>
-			
-			<div id="results">
-			</div>
-		
+        <div id="calendar_find_courses">
+            <!--
+            1. Search Bar (span) - Name, Department, College, Course Number 
+            //As one is selected, add it by name (ex: Name: Intro to CS or Department: "Computer Science")
+            2. Course Level (Multi-select drag+color)
+            3. BoK Category
+            4. "Find Courses" button
+            -->
+            <div class="searchresults">
+		        <div class="searchbar" style="display:none">Search for course name, department, college, etc..</div>
+		        <input type="text" name="searchInput" id="searchBox">
+		        <input type="button" id="mandatorySearch" value="">
+		        <div id="filters"></div>
+		        <div id="results"></div>
+            </div>
         </div>
-</div>
 	
    
-	<div class="selectedcourses">
-    <h3>Selected Courses</h3>
-	</div>
+        <div class="selectedcourses">
+            <h3>Selected Courses</h3>
+        </div>
     
-    <div class="schedule">
-    <?php require "calendar.php"; ?>
+        <div class="schedule">
+        <?php require "calendar.php"; ?>
     
-    <div class="selectionOptions">
-        <button id="selectionSearch" value="selectionSearch">Find Courses</button>
-        <button id="cancelSelection" value="cancelSelection">Cancel</button>
+            <div class="selectionOptions">
+                <button id="selectionSearch" value="selectionSearch">Find Courses</button>
+                <button id="cancelSelection" value="cancelSelection">Cancel</button>
+            </div>
+        </div>
     </div>
-    
-    </div>
-    </div>
-		
-    <
-	
-	
 </div>
 
 <div id="searchDialog">
