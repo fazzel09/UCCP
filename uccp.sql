@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Jan 13, 2013 at 09:08 PM
+-- Generation Time: Feb 13, 2013 at 04:46 AM
 -- Server version: 5.5.24-log
 -- PHP Version: 5.3.13
 
@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS `courses` (
   `college_id` int(10) NOT NULL,
   `level` int(10) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=11 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=18 ;
 
 --
 -- Dumping data for table `courses`
@@ -62,7 +62,13 @@ INSERT INTO `courses` (`id`, `creditHours`, `courseNum`, `description`, `CourseN
 (7, 4, 'MATH1061', 'Calc 1', 'Calculus 1', 0, 0, 0),
 (8, 4, 'MATH1062', 'calc 2', 'Calculus 2', 0, 0, 0),
 (9, 4, 'PHYS1051', 'Physics 1', 'Gen Physics 1', 0, 0, 0),
-(10, 1, 'PHYS1051L', 'Phys 1 Lab', 'Gen Physics 1 Lab', 0, 0, 0);
+(10, 1, 'PHYS1051L', 'Phys 1 Lab', 'Gen Physics 1 Lab', 0, 0, 0),
+(11, 3, 'ACCT2074', 'Financial Accounting', 'Financial Accounting', 0, 0, 0),
+(12, 3, 'BIOL1002', 'intro to animal behav', 'Introduction to animal behavio', 0, 0, 0),
+(14, 3, 'AE1011', 'Arch Skills 1', 'Arch Skills 1', 0, 0, 0),
+(15, 3, 'CS5002', 'CS Senior Design 2', 'CS Senior Design 2', 0, 0, 0),
+(16, 4, 'CHEM1040', 'Gen chem 1', 'Gen Chem 1', 0, 0, 0),
+(17, 4, 'AEEM2042C', 'aerodynamics', 'Aerodynamics', 0, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -96,7 +102,7 @@ CREATE TABLE IF NOT EXISTS `sections` (
   `location` varchar(30) DEFAULT NULL,
   `callNum` varchar(15) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=12 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=26 ;
 
 --
 -- Dumping data for table `sections`
@@ -112,7 +118,15 @@ INSERT INTO `sections` (`id`, `course_id`, `sectNum`, `campus`, `instruction`, `
 (8, 8, 2, 'WEST', 'LE', 'MTWRF', '09:05:00', '10:00:00', 'OLDCHEM605', '700969'),
 (9, 9, 1, 'WEST', 'LE', 'TR', '11:00:00', '12:50:00', 'BRAUNSTN300', '700981'),
 (10, 10, 1, 'WEST', 'LB', 'T', '08:00:00', '10:00:00', 'BRAUNSTN340', '706957'),
-(11, 10, 2, 'WEST', 'LB', 'W', '10:10:00', '12:10:00', 'BRAUNSTN340', '706958');
+(11, 10, 2, 'WEST', 'LB', 'W', '10:10:00', '12:10:00', 'BRAUNSTN340', '706958'),
+(12, 11, 2, 'WEST', 'LE', 'MW', '11:15:00', '12:10:00', 'LINDNER 112', '703894'),
+(13, 11, 1, 'WEST', 'LE', 'MW', '11:15:00', '12:10:00', 'LINDNER 112', '703895'),
+(14, 12, 1, 'OC', 'LE', 'W', '17:30:00', '20:20:00', 'ZOO-OC', '707685'),
+(15, 12, 3, 'OC', 'LE', 'R', '17:30:00', '20:20:00', 'ZOO-OC', '707687'),
+(17, 12, 2, 'OC', 'LE', 'W', '17:30:00', '20:20:00', 'ZOO-OC', '707686'),
+(25, 14, 1, 'West', 'LE', 'MW', '13:00:00', '16:50:00', 'OldChem615B', '706608'),
+(19, 14, 2, 'West', 'LE', 'TR', '13:00:00', '16:50:00', 'OldChem615B', '706609'),
+(23, 17, 1, 'WEST', 'LE', 'MWF', '11:15:00', '12:10:00', 'OldChem615B', '802150');
 
 -- --------------------------------------------------------
 

@@ -1,5 +1,6 @@
 $(document).ready(function(){
 	$('body').disableSelection();
+	$('#results').nanoScroller();
 	
 	/* ----- Data types used for local course information ----- */
 	function Course(value)
@@ -204,10 +205,10 @@ $(document).ready(function(){
 	/*Replaces the previous results list with the most recent results */
 	function updateResultsList(data)
 	{
-		$('#results').html("");
+		$('#results .content').html("");
 		var courseNum = null;
 		var curRow;
-		$('#results').remove('.courseRow');
+		$('#results .content').remove('.courseRow');
 		for(var i =0;i<searchResults.length; i++)
 		{
 			curRow = searchResults[i];
@@ -215,7 +216,7 @@ $(document).ready(function(){
 			{
 				//add a course row, and the first section
 				courseNum = curRow.courseNum;
-				$('#results').append(curRow.courseRow);
+				$('#results .content').append(curRow.courseRow);
 				$('.sectionData.'+courseNum).append(curRow.sectionRow);
 				setSectionRowListeners(curRow.callNum);
 			}
@@ -228,28 +229,28 @@ $(document).ready(function(){
 		}
 		$(".sectionData").hide();
 		
+		$('#results').nanoScroller();
 		$('.showSections').toggle(
 		function(event){
 			$(".sectionData."+event.target.className.split(' ')[1]).show();
 			$(this).toggleClass('expanded');
-			
+			$('#results').nanoScroller();
 		},
 		function(event){
 			$(".sectionData."+event.target.className.split(' ')[1]).hide();
 			$(this).toggleClass('expanded');
-			
+			$('#results').nanoScroller();
 		});
 	}
 
 	function setSectionRowListeners(callNum){
-		console.log("Setting them now Honkey");
 		//If we already selected this course, make it not draggable.
 		for(var i=0; i<selectedCourses.length; i++)
 		{
 			if(callNum == selectedCourses[i].callNum)
 			{
-				console.log("Shit is already added");
-				return
+				$('.sectionRow.'+callNum).toggleClass('disabled', true);
+				return;
 			}
 		}
 		
@@ -304,6 +305,14 @@ $(document).ready(function(){
 	//Search the selected courses for a given callNum.
 	function findCourse(callNum)
 	{
+		for(var i=0;i<selectedCourses.length; i++)
+		{
+			if(selectedCourses[i].callNum == callNum)
+			{
+				console.log('course found');
+				return selectedCourses[i];
+			}
+		}
 		for(var i=0;i<searchResults.length; i++)
 		{
 			if(searchResults[i].callNum == callNum)
@@ -312,6 +321,7 @@ $(document).ready(function(){
 				return searchResults[i];
 			}
 		}
+
 		return null;
 	}
 	
@@ -356,7 +366,7 @@ $(document).ready(function(){
 	
 		$('.selectedcourses .sectionRow.'+callNum).css('background', 'rgba('+course.color+')');
 		//$('.sectionRow.'+callNum).draggable('disable');
-		$('#results .'+callNum).unbind();
+		$('#results .content .'+callNum).unbind();
 		$('.sectionAddButton.'+callNum).unbind()
 		$('.sectionRow.'+callNum).attr('cursor', 'default');
 		$('.sectionRow.'+callNum).toggleClass('disabled', true);
@@ -374,7 +384,7 @@ $(document).ready(function(){
 	function addToCalendar(addedCourse)
 	{
 		var startPositionY = Math.round(($('.'+addedCourse.startTime.hour).offset().top - $('#calendar').offset().top)+ addedCourse.startTime.minute/60*hourHeight);
-		var startPositionX = $('.'+addedCourseDay).offset().left - $('#calendar').offset().left
+		
 		
 		var blockHeight=(addedCourse.duration.hours*hourHeight) + (addedCourse.duration.minutes/60*hourHeight);
 		
@@ -384,6 +394,7 @@ $(document).ready(function(){
 		for(var i=0;i<addedCourse.days.length;i++)
 		{	
 			var addedCourseDay = addedCourse.days[i];
+			var startPositionX = $('.'+addedCourseDay).offset().left - $('#calendar').offset().left
 			
 			$('#calendar').append('<div class="sectionBlock '+addedCourse.callNum+' '+addedCourseDay+'">'+addedCourse.sectionBlock+'</div>');
 			$('.sectionBlock.'+addedCourse.callNum+'.'+addedCourseDay).css('width',dayWidth);
@@ -395,6 +406,25 @@ $(document).ready(function(){
 		}
 
 		updateDayArrays(addedCourse.days, addedCourse.callNum, checkConflicts);
+		
+		$('.sectionBlock').hover(function(e)
+		{
+			console.log('Hover: '+$(this).attr('class'));
+			console.log('Height: '+$(this).height());
+			
+			var course = findCourse($(this).attr('class').split(' ')[1]);
+			
+			$('#sectionInfoDialog').dialog( "option", "title", course.courseName);
+			$('#sectionInfoDialog').html(course.detailedSectionInfo);
+			$('#sectionInfoDialog').dialog( "option", "position", [$(this).offset().left+20,$(this).offset().top +$(this).height() - $(window).scrollTop()+20] );
+			$('#sectionInfoDialog').dialog('open');
+			
+		},
+		function(e)
+		{
+			console.log('HoverOut');
+			$('#sectionInfoDialog').dialog('close');
+		});
 	};
 	
 	/* add a new course to the approprate Day Array */
@@ -691,7 +721,6 @@ $(document).ready(function(){
 			console.log('HoverOut');
 			$('#sectionInfoDialog').dialog('close');
 		});
-		
 	}
 	
 	

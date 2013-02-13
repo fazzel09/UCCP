@@ -1,16 +1,15 @@
 <html>
 <head>
-<script type="text/javascript" src="scripts/jquery-1.7.1.min.js"></script>
-<script type="text/javascript" src="scripts/clickanddrag.js"></script>
-<script type="text/javascript"
-    src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
-<script type="text/javascript"
-    src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
 <script type="text/javascript" src="Scripts/coursePlanner.js"></script>
+<script type="text/javascript" src="Scripts/jquery.nanoscroller.min.js"></script>
+
   
-  <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
+<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
 <link rel="stylesheet" type="text/css" href="style.css" />
 <link rel="stylesheet" type="text/css" href="calendar_style.css" />
+<link rel="stylesheet" type="text/css" href="nanoscroller.css"> 
 <title>University of Cincinnati Course Planner
 </title>
 </head>
@@ -65,7 +64,9 @@ $DB -> connect();
 		        <input type="text" name="searchInput" id="searchBox">
 		        <input type="button" id="mandatorySearch" value="">
 		        <div id="filters"></div>
-		        <div id="results"></div>
+		        <div id="results" class="nano">
+                <div class="content"></div>
+                </div>
             </div>
         </div>
 	
