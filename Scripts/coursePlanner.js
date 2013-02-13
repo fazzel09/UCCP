@@ -69,6 +69,11 @@ $(document).ready(function(){
 	
 	/* ----- search Functions -----*/
 	$('#mandatorySearch').click(function(){
+		search();
+	});
+	
+	function search()
+	{
 		if(!searchStartTime)
 		{
 			searchStartTime='0700';
@@ -131,7 +136,7 @@ $(document).ready(function(){
 			}
 		});
 		resetSearchItems();		
-	});
+	}
 	
 	$('#selectionSearch').click(function()
 	{
@@ -291,7 +296,7 @@ $(document).ready(function(){
 /*		row.draggable({
 			//revert:true,
 			helper:'clone',
-			connectToSortable: '.selectedcourses',
+			connectToSortable: 's',
 		});*/
 		
 		//console.log('enable dragging on the row')
@@ -323,7 +328,7 @@ $(document).ready(function(){
 			$('.sectionOverlay').remove();
 		});
 
-/*		$('.selectedcourses').sortable({
+/*		$('s').sortable({
 			receive: function(event, ui){
 				console.log('Section Recieved: ' + ui.item.attr('class'));
 				
@@ -376,9 +381,10 @@ $(document).ready(function(){
 			$('.sectionOverlay.'+addedCourse.callNum+'.'+addedCourseDay).css({width:dayWidth,
 				height:blockHeight,
 				top:startPositionY,
-				left:startPositionX,
-				background: 'rgba('+addedCourse.color+')'
-				});
+				left:startPositionX+20,
+				background: 'rgba('+addedCourse.color+')',
+				width: dayWidth-20
+			});
 				
 		}
 	}
@@ -391,13 +397,13 @@ $(document).ready(function(){
 		var course = findCourse(callNum);
 		
 		//If the course doesn't already exist, add the course to the selected Courses box.
-		if(!$('.selectedcourses .sectionRow.'+callNum).is('*'))
+		if(!$('s .sectionRow.'+callNum).is('*'))
 		{
 			console.log('Adding double clicked section');
-			$('.selectedcourses').append(course.sectionRow);	
+			$('s').append(course.sectionRow);	
 		}
 	
-		$('.selectedcourses .sectionRow.'+callNum).css('background', 'rgba('+course.color+')');
+		$('s .sectionRow.'+callNum).css('background', 'rgba('+course.color+')');
 		//$('.sectionRow.'+callNum).draggable('disable');
 		$('#results .content .'+callNum).unbind();
 		$('.sectionAddButton.'+callNum).unbind()
@@ -449,7 +455,7 @@ $(document).ready(function(){
 			
 			$('#sectionInfoDialog').dialog( "option", "title", course.courseName);
 			$('#sectionInfoDialog').html(course.detailedSectionInfo);
-			$('#sectionInfoDialog').dialog( "option", "position", [$(this).offset().left+20,$(this).offset().top +$(this).height() - $(window).scrollTop()+20] );
+			$('#sectionInfoDialog').dialog( "option", "position", [e.pageX+20,$(this).offset().top +$(this).height() - $(window).scrollTop()+20] );
 			$('#sectionInfoDialog').dialog('open');
 			
 		},
@@ -559,7 +565,7 @@ $(document).ready(function(){
 	function deleteSelectedCourse(callNum)
 	{
 		$('#sectionInfoDialog').dialog('close');
-		$('.selectedcourses .sectionRow.'+callNum+', .sectionBlock.'+callNum).remove();
+		$('s .sectionRow.'+callNum+', .sectionBlock.'+callNum).remove();
 		//$('.sectionBlock.'+callNum).remove();
 		$('.sectionRow.'+callNum).toggleClass('disabled', false);
 		
@@ -672,14 +678,15 @@ $(document).ready(function(){
 			var index = ((time.slice(0,2)-7)*12) + 6;	
 		}
 		
-		updateDayArrays(day, index, findFreeSlot)
+		updateDayArrays(day, index, findFreeSlot);
+		search();	
 		console.log('start time: '+time+', day: '+day+', index: '+index);	
 	});
 	
 	//Reset the listeners that display the selection box over the calendar. This must be done after a selection, to be ready for the next selection.
 	function resetSelectionListeners()
 	{		
-		$('#calendar td').not('.hourHeader, .dayHeader').mousedown(function(e)
+		$('#calendar td').mousedown(function(e)
 		{
 			console.log('target: '+$(this).attr('class'));
 			var target = e.target;
@@ -700,7 +707,7 @@ $(document).ready(function(){
 	
 			$('#calendar .'+searchDay+', .selectionBox').mousemove(function(e)
 			{
-				console.log('target: ' + e.target.className);
+				//console.log('target: ' + e.target.className);
 				var height = e.pageY - $('#calendar').offset().top - top;
 				if(height<0)
 				{
@@ -713,29 +720,28 @@ $(document).ready(function(){
 				}
 				$('.selectionBox').css('height', height)
 			});
-
-			$('# calendar td').mouseover(function(e)
-			{
-				searchEndTime = e.target.className.split(' ')[0];
-			});
 			
 			$('#calendar td').mouseup(function(e)
 			{
 				searchEndTime = e.target.className.split(' ')[0];
-				$('.selectionBox, #calendar td, #calendar, #calendar .'+searchDay).unbind();
-				console.log('mouseup '+e.target.className);
+				$('.selectionBox, #calendar td, #calendar, #calendar .'+searchDay+', .sectionBlock').unbind();
+				console.log('mouseup '+e.target.className+' Start/end time: '+searchStartTime+'/'+searchEndTime);
 				resetSelectionListeners();
+				if(searchStartTime != searchEndTime)
+				{
+					search();	
+				}
 			});
 			
 			$('.sectionBlock').mouseover(function(e)
 			{
-				$('.selectionBox, #calendar td, #calendar, #calendar .'+searchDay).unbind();
+				$('.selectionBox, #calendar td, #calendar, #calendar .'+searchDay+', .sectionBlock').unbind();
 				console.log('mouseup '+e.target.className);
 				resetSelectionListeners();
 			});
 		});
 		
-				//Add a listener on the section block on the calendar to overlay detailed section info.
+		//Add a listener on the section block on the calendar to overlay detailed section info.
 		$('.sectionBlock').hover(function(e)
 		{
 			console.log('Hover: '+$(this).attr('class'));
@@ -762,7 +768,7 @@ $(document).ready(function(){
 		var letters = '0123456789ABCDEF'.split('');
 		var color = '';
 		for (var i = 0; i < 3; i++ ) {
-			color += Math.round(Math.random() * 255)+', ';
+			color += Math.round(Math.random() * 155 + 100)+', ';
 		}
 		color += '1'
 		console.log('Color'+color);
@@ -808,25 +814,9 @@ $(document).ready(function(){
 	$('#sectionInfoDialog').dialog({
 		autoOpen:false,
 		modal:false,
-		height:120,
-		width:270,
+		height:150,
+		width:230,
 		resizable:false
-	});
-	
-	$('#showSelectedCourses').click(function(e)
-	{
-		if(!$('.selectedcourses').is(':visible'))
-		{
-			//console.log("Show sections");
-			$(".selectedcourses").css("display", "block");
-			$('#showSelectedCourses').html('Hide Selected Courses');
-		}
-		else
-		{
-			//console.log("Hide Sections");
-			$(".selectedcourses").css("display", "none");
-			$('#showSelectedCourses').html('Show Selected Courses');
-		}
 	});
 	
 	function resetSearchItems()
