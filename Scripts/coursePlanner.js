@@ -74,6 +74,7 @@ $(document).ready(function(){
 	
 	function search()
 	{
+		$('.selectionBox').css('opacity','.5');
 		if(!searchStartTime)
 		{
 			searchStartTime='0700';
@@ -123,7 +124,6 @@ $(document).ready(function(){
 				console.log("Success");
 				generateArrays(data);
 				addFilter($('#searchBox').val());
-				$('.selectionBox').remove();
 				updateResultsList(data);
 			},
 			error:function(xhr, ajaxOptions, thrownError){
@@ -183,7 +183,6 @@ $(document).ready(function(){
 				generateArrays(data);
 				updateResultsList(data);
 				
-				$('.selectionBox').remove();
 				$('.selectionOptions').css('display','none');
 			},
 			error:function(xhr, ajaxOptions, thrownError)
@@ -392,6 +391,7 @@ $(document).ready(function(){
 	//Add a section to the calendar
 	function addSection(callNum)
 	{
+		$('.selectionBox').remove();
 		$('.sectionOverlay').remove();
 		//Find the course corresponding with this callnum
 		var course = findCourse(callNum);
@@ -839,7 +839,7 @@ $(document).ready(function(){
 	var searchResults = new Array();
 	var selectedCourses = new Array();
 	var hourHeight = $('.08').position().top - $('.07').position().top
-	var dayWidth = $('.T').position().left - $('.M').position().left;
+	var dayWidth = $('.T').position().left - $('.M').position().left-3;
 	
 	var monday = new Array();
 	var tuesday = new Array();
