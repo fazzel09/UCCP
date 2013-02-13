@@ -12,7 +12,7 @@ $(document).ready(function(){
 		this.startTime = new Time( value['start_time']);
 		this.endTime = new Time( value['end_time']);
 		this.duration = new Duration(this.startTime, this.endTime);
-		this.color = null;
+		this.color = getRandomColor();
 		
 		// These are the rows in the search results list.
 		this.courseRow = '<div class="courseRow '+this.courseNum+'"><div class="courseInfo">'+this.courseNum+':'+this.courseName+'</div><img class="showSections '+this.courseNum
@@ -73,7 +73,13 @@ $(document).ready(function(){
 			url:'Scripts/database.php',
 			dataType:'json',
 			data:{
-				search:$('#searchBox').val()
+				search:$('#searchBox').val(),
+				days:searchDays,
+				startTime:searchStartTime,
+				endTime:searchEndTime,
+				discipline:searchDiscipline,
+				college:searchCollege,
+				bok:searchBOK
 			},
 			success:function(data){
 				console.log("Success");
@@ -240,7 +246,7 @@ $(document).ready(function(){
 		//If we already selected this course, make it not draggable.
 		for(var i=0; i<selectedCourses.length; i++)
 		{
-			if(callNum = selectedCourses[i].callNum)
+			if(callNum == selectedCourses[i].callNum)
 			{
 				console.log("Shit is already added");
 				return
@@ -315,7 +321,6 @@ $(document).ready(function(){
 		
 		var startPositionY = Math.round(($('.'+addedCourse.startTime.hour).offset().top - $('#calendar').offset().top)+ addedCourse.startTime.minute/60*hourHeight);
 		
-		
 		var blockHeight=(addedCourse.duration.hours*hourHeight) + (addedCourse.duration.minutes/60*hourHeight);
 		
 		//For each day the section is on, compute the width
@@ -325,10 +330,13 @@ $(document).ready(function(){
 			var startPositionX = $('.'+addedCourseDay).offset().left - $('#calendar').offset().left
 			
 			$('#calendar').append('<div class="sectionOverlay '+addedCourse.callNum+' '+addedCourseDay+'">'+addedCourse.sectionBlock+'</div>');
-			$('.sectionOverlay.'+addedCourse.callNum+'.'+addedCourseDay).css('width',dayWidth);
-			$('.sectionOverlay.'+addedCourse.callNum+'.'+addedCourseDay).css('height',blockHeight);
-			$('.sectionOverlay.'+addedCourse.callNum+'.'+addedCourseDay).css('top',startPositionY);
-			$('.sectionOverlay.'+addedCourse.callNum+'.'+addedCourseDay).css('left', startPositionX);
+			$('.sectionOverlay.'+addedCourse.callNum+'.'+addedCourseDay).css({width:dayWidth,
+				height:blockHeight,
+				top:startPositionY,
+				left:startPositionX,
+				background: 'rgba('+addedCourse.color+')'
+				});
+				
 		}
 	}
 	
@@ -345,8 +353,6 @@ $(document).ready(function(){
 			console.log('Adding double clicked section');
 			$('.selectedcourses').append(course.sectionRow);	
 		}
-		
-		course.color = getRandomColor();
 	
 		$('.selectedcourses .sectionRow.'+callNum).css('background', 'rgba('+course.color+')');
 		//$('.sectionRow.'+callNum).draggable('disable');
@@ -389,24 +395,6 @@ $(document).ready(function(){
 		}
 
 		updateDayArrays(addedCourse.days, addedCourse.callNum, checkConflicts);
-		
-		//Add a listener on the section block on the calendar to overlay detailed section info.
-		$('.sectionBlock').hover(
-				function(e)
-		{
-			console.log('Hover: '+$(this).attr('class'));
-			var course = findCourse($(this).attr('class').split(' ')[1]);
-			
-			$('#sectionInfoDialog').dialog( "option", "title", course.courseName);
-			$('#sectionInfoDialog').html(course.detailedSectionInfo);
-			$('#sectionInfoDialog').dialog('open');
-			$('#sectionInfoDialog').dialog( "option", "position", [e.pageX+20,e.pageY+20] );
-		},
-		function(e)
-		{
-			console.log('HoverOut');
-			$('#sectionInfoDialog').dialog('close');
-		});
 	};
 	
 	/* add a new course to the approprate Day Array */
@@ -507,6 +495,7 @@ $(document).ready(function(){
 
 	function deleteSelectedCourse(callNum)
 	{
+		$('#sectionInfoDialog').dialog('close');
 		$('.selectedcourses .sectionRow.'+callNum+', .sectionBlock.'+callNum).remove();
 		//$('.sectionBlock.'+callNum).remove();
 		$('.sectionRow.'+callNum).toggleClass('disabled', false);
@@ -521,6 +510,7 @@ $(document).ready(function(){
 		}
 		updateDayArrays('MTWRF', callNum, removeCourseFromDayArray);
 		updateDayArrays('MTWRF', callNum, checkConflicts);
+		
 		setSectionRowListeners(callNum);
 	};
 	
@@ -626,7 +616,7 @@ $(document).ready(function(){
 	//Reset the listeners that display the selection box over the calendar. This must be done after a selection, to be ready for the next selection.
 	function resetSelectionListeners()
 	{		
-		$('#calendar td').mousedown(function(e)
+		$('#calendar td').not('.hourHeader, .dayHeader').mousedown(function(e)
 		{
 			console.log('target: '+$(this).attr('class'));
 			var target = e.target;
@@ -669,18 +659,39 @@ $(document).ready(function(){
 			$('#calendar td').mouseup(function(e)
 			{
 				searchEndTime = e.target.className.split(' ')[0];
-				$('.selectionBox, #calendar td, #calendar, #calendar .'+searchDay+', .sectionBlock').unbind();
+				$('.selectionBox, #calendar td, #calendar, #calendar .'+searchDay).unbind();
 				console.log('mouseup '+e.target.className);
 				resetSelectionListeners();
 			});
 			
 			$('.sectionBlock').mouseover(function(e)
 			{
-				$('.selectionBox, #calendar td, #calendar, #calendar .'+searchDay+', .sectionBlock').unbind();
+				$('.selectionBox, #calendar td, #calendar, #calendar .'+searchDay).unbind();
 				console.log('mouseup '+e.target.className);
 				resetSelectionListeners();
 			});
 		});
+		
+				//Add a listener on the section block on the calendar to overlay detailed section info.
+		$('.sectionBlock').hover(function(e)
+		{
+			console.log('Hover: '+$(this).attr('class'));
+			console.log('Height: '+$(this).height());
+			
+			var course = findCourse($(this).attr('class').split(' ')[1]);
+			
+			$('#sectionInfoDialog').dialog( "option", "title", course.courseName);
+			$('#sectionInfoDialog').html(course.detailedSectionInfo);
+			$('#sectionInfoDialog').dialog( "option", "position", [$(this).offset().left+20,$(this).offset().top +$(this).height() - $(window).scrollTop()+20] );
+			$('#sectionInfoDialog').dialog('open');
+			
+		},
+		function(e)
+		{
+			console.log('HoverOut');
+			$('#sectionInfoDialog').dialog('close');
+		});
+		
 	}
 	
 	
@@ -691,7 +702,7 @@ $(document).ready(function(){
 		for (var i = 0; i < 3; i++ ) {
 			color += Math.round(Math.random() * 255)+', ';
 		}
-		color += '.5'
+		color += '1'
 		console.log('Color'+color);
 		return color;
 	}
@@ -732,13 +743,43 @@ $(document).ready(function(){
 	$('#sectionInfoDialog').dialog({
 		autoOpen:false,
 		modal:false,
-		height:200,
+		height:120,
+		width:270,
 		resizable:false
 	});
 	
+	$('#showSelectedCourses').click(function(e)
+	{
+		if(!$('.selectedcourses').is(':visible'))
+		{
+			//console.log("Show sections");
+			$(".selectedcourses").css("display", "block");
+			$('#showSelectedCourses').html('Hide Selected Courses');
+		}
+		else
+		{
+			//console.log("Hide Sections");
+			$(".selectedcourses").css("display", "none");
+			$('#showSelectedCourses').html('Show Selected Courses');
+		}
+	});
+	
+	function resetSearchItems()
+	{
+		searchStartTime = '0700';
+		searchEndTime = '2200';
+		searchDays = 'MTWHFSU';
+		searchDiscipline = '';
+		searchCollege= '';
+		searchBOK = ''
+	}
+	
 	var searchStartTime;
 	var searchEndTime;
-	var searchDay;
+	var searchDays;
+	var searchDiscipline;
+	var searchCollege;
+	var searchBOK;
 		
 	var searchResults = new Array();
 	var selectedCourses = new Array();

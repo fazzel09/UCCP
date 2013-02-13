@@ -70,19 +70,21 @@ $DB -> connect();
         </div>
 	
    
-        <div class="selectedcourses">
-            <h3>Selected Courses</h3>
-        </div>
+
     
         <div class="schedule">
         <?php require "calendar.php"; ?>
     
-            <div class="selectionOptions">
-                <button id="selectionSearch" value="selectionSearch">Find Courses</button>
-                <button id="cancelSelection" value="cancelSelection">Cancel</button>
+            <div class="scheduleButtons">
+                <button id="showSelectedCourses" value="showSelectedCourses">Show Courses</button>
+                <button id="export" value="export">Export</button>
             </div>
         </div>
-    </div>
+        <div class="selectedcourses">
+            <h3>Selected Courses</h3>
+        </div>
+	</div>
+
 </div>
 
 <div id="searchDialog">
