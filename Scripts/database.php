@@ -46,9 +46,9 @@ class DB{
 		}
 	}
 	
-	public function searchCourses($search)
+	public function searchCourses($search, $startTime, $endTime)
 	{
-		$sql = "Select courses.CourseName, courses.courseNum, courses.creditHours, sections.sectNum, sections.start_time, sections.end_time, sections.days, sections.callNum FROM Courses JOIN sections ON courses.id = sections.course_id WHERE courseNum LIKE '%".$search."%' OR CourseName LIKE '%".$search."%' ORDER BY courses.courseNum, sections.sectNum";
+		$sql = "Select courses.CourseName, courses.courseNum, courses.creditHours, sections.sectNum, sections.start_time, sections.end_time, sections.days, sections.callNum FROM Courses JOIN sections ON courses.id = sections.course_id WHERE (courseNum LIKE '%".$search."%' OR CourseName LIKE '%".$search."%') AND (sections.start_time > '".$startTime."' AND sections.end_time < '".$endTime."') ORDER BY courses.courseNum, sections.sectNum";
 		$result = mysql_query($sql) or die(mysql_error());
 		
 		while($row = mysql_fetch_array($result)){
@@ -87,7 +87,7 @@ $DB = new DB();
 $DB->connect();
 if(isset($_POST['search']))
 {
-	$DB->searchCourses($_POST['search']);	
+	$DB->searchCourses($_POST['search'],$_POST['startTime'],$_POST['endTime']);	
 }
 if(isset($_POST['searchSections']))
 {
