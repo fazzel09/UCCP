@@ -16,10 +16,11 @@ $(document).ready(function(){
 		this.color = getRandomColor();
 		
 		// These are the rows in the search results list.
-		this.courseRow = '<div class="courseRow '+this.courseNum+'"><div class="courseInfo">'+this.courseNum+':'+this.courseName+'</div><img class="showSections '+this.courseNum
-			+'" id="showSections" ><div class="sectionData '+this.courseNum+'"></div></div>';
+		this.courseRow = '<div class="courseRow '+this.courseNum+'"><div class="courseInfo">'+this.courseNum+':'+this.courseName+'</div><img class="showSections '
+			+this.courseNum	+'" id="showSections" ><div class="sectionData '+this.courseNum+'"></div></div>';
 		this.sectionRow = '<div class="sectionRow '+this.callNum+'" ><div class="deleteSection '
-			+this.callNum+'">X</div><div class="courseNum">'+this.courseNum+'</div><div class="sectionInfo">'+this.days+':'+this.startTime.string+'-'+this.endTime.string+' Instructor here</div><img class="sectionAddButton '+this.callNum+'"></div>';
+			+this.callNum+'">X</div><div class="courseNum">'+this.courseNum+'</div><div class="sectionInfo">'+this.days+':'+this.startTime.string+'-'
+			+this.endTime.string+' Instructor here</div><img class="sectionAddButton '+this.callNum+'"></div>';
 		
 		//The detailed information that goes into the popover when you mouse over a section on the calendar.	
 		this.detailedSectionInfo = '<table>'
@@ -65,13 +66,7 @@ $(document).ready(function(){
 		}
 	}
 	
-	var filters = new Array()
-	
 	/* ----- search Functions -----*/
-	$('#mandatorySearch').click(function(){
-		search();
-	});
-	
 	function search()
 	{
 		$('.selectionBox').css('opacity','.5');
@@ -137,69 +132,6 @@ $(document).ready(function(){
 		});
 		resetSearchItems();		
 	}
-	
-	$('#selectionSearch').click(function()
-	{
-		console.log('start: '+searchStartTime+', end: '+searchEndTime);
-			
-		//Add a '00' onto the end of times with only the hours: 10 becomes 1000
-		if(searchStartTime.length<3)
-		{
-			searchStartTime+=00;	
-		}
-		
-		if(searchStartTime>searchEndTime)
-		{
-			var temp = searchStartTime;
-			searchStartTime = searchEndTime;
-			searchEndTime = temp;	
-		}
-			
-		searchStartTime = searchStartTime.substring(0, 2) + ':' + searchStartTime.substring(2, searchStartTime.length);
-		
-		
-		if(searchEndTime.length<3)
-		{
-			searchEndTime+=':00';
-		}
-		else
-		{
-			searchEndTime = searchEndTime.substring(0, 2) + ':' + searchEndTime.substring(2, searchEndTime.length)
-		}
-		
-		console.log('Days: '+searchDay+', Times: '+searchStartTime+'-'+searchEndTime);
-		
-		$.ajax({
-			type:'POST',
-			url:'Scripts/database.php',
-			dataType:'json',
-			data:{
-				selectionSearchDay: searchDay, 
-				searchStartTime: searchStartTime,
-				searchEndTime: searchEndTime
-			},
-			success:function(data){
-				console.log("sectionSearch success");
-				generateArrays(data);
-				updateResultsList(data);
-				
-				$('.selectionOptions').css('display','none');
-			},
-			error:function(xhr, ajaxOptions, thrownError)
-			{
-				console.log("selectionSearch failed" + thrownError);
-				if(xhr.status == 200)
-				{
-					alert("No results found");
-					$('#results').html("");
-				}
-				else
-				{
-					alert("Search failed. Response status: "+xhr.status);
-				}
-			}
-		});
-	});
 	
 	/* Adding a filter to the search */
 	function addFilter( filter )
@@ -280,6 +212,7 @@ $(document).ready(function(){
 		});
 	}
 
+	/*Set all the listeners on the section rows in the results list*/
 	function setSectionRowListeners(callNum){
 		//If we already selected this course, make it not draggable.
 		for(var i=0; i<selectedCourses.length; i++)
@@ -318,25 +251,12 @@ $(document).ready(function(){
 		row.hover(
 		function(e)
 		{
-			console.log('Hover');
 			displaySectionOverlay($(this).attr('class').split(' ')[1]);
 		},
 		function(e)
 		{
-			console.log('HoverOut');
 			$('.sectionOverlay').remove();
 		});
-
-/*		$('s').sortable({
-			receive: function(event, ui){
-				console.log('Section Recieved: ' + ui.item.attr('class'));
-				
-				var callNum = ui.item.attr('class').split(' ')[1];
-				
-				addSection(callNum)
-
-			}
-		});*/
 	};
 	
 	//Search the selected courses for a given callNum.
@@ -384,11 +304,10 @@ $(document).ready(function(){
 				background: 'rgba('+addedCourse.color+')',
 				width: dayWidth-20
 			});
-				
 		}
 	}
 	
-	//Add a section to the calendar
+	//Add a section to the appropriate arrays
 	function addSection(callNum)
 	{
 		$('.selectionBox').remove();
@@ -420,15 +339,14 @@ $(document).ready(function(){
 		});
 	}
 	
+	//Adds a section to the calendar
 	function addToCalendar(addedCourse)
 	{
 		var startPositionY = Math.round(($('.'+addedCourse.startTime.hour).offset().top - $('#calendar').offset().top)+ addedCourse.startTime.minute/60*hourHeight);
 		
-		
 		var blockHeight=(addedCourse.duration.hours*hourHeight) + (addedCourse.duration.minutes/60*hourHeight);
 		
-		
-		updateDayArrays(addedCourse.days, addedCourse, addCourseToDayArray)
+		iterateOverDays(addedCourse.days, addedCourse, addCourseToDayArray)
 		//For each day the section is on, compute the width
 		for(var i=0;i<addedCourse.days.length;i++)
 		{	
@@ -436,15 +354,13 @@ $(document).ready(function(){
 			var startPositionX = $('.'+addedCourseDay).offset().left - $('#calendar').offset().left
 			
 			$('#calendar').append('<div class="sectionBlock '+addedCourse.callNum+' '+addedCourseDay+'">'+addedCourse.sectionBlock+'</div>');
-			$('.sectionBlock.'+addedCourse.callNum+'.'+addedCourseDay).css('width',dayWidth);
-			$('.sectionBlock.'+addedCourse.callNum+'.'+addedCourseDay).css('height',blockHeight);
-			$('.sectionBlock.'+addedCourse.callNum+'.'+addedCourseDay).css('background','rgba('+addedCourse.color+')');
-			$('.sectionBlock.'+addedCourse.callNum+'.'+addedCourseDay).css('top',startPositionY);
-			console.log("course Day: "+$('.'+addedCourseDay).position());
-			$('.sectionBlock.'+addedCourse.callNum+'.'+addedCourseDay).css('left',+'px');
+			$('.sectionBlock.'+addedCourse.callNum+'.'+addedCourseDay).css({
+				'width':dayWidth,
+				'height':blockHeight,
+				'background':'rgba('+addedCourse.color+')',
+				'top':startPositionY} );
 		}
-
-		updateDayArrays(addedCourse.days, addedCourse.callNum, checkConflicts);
+		iterateOverDays(addedCourse.days, addedCourse.callNum, checkConflicts);
 		
 		$('.sectionBlock').hover(function(e)
 		{
@@ -477,17 +393,9 @@ $(document).ready(function(){
 		for(var i=startIndex; i<=endIndex; i++)
 		{
 			array[i].courses.push(course.callNum);
-				
 		}
 	}
 	
-	function outputCourseDayArrays()
-	{
-		for(var i=0; i<monday.length; i++)
-		{
-			console.log('M '+ monday[i].courses[0] + 'T' +tuesday[i].courses[0]);	
-		}
-	}
 	// Each element in selectedcourses is a "calendarBlock", it has an array of courses that are currently selected at that particular time.
 	function CalendarBlock(value)
 	{
@@ -497,10 +405,9 @@ $(document).ready(function(){
 			return;
 		}	
 		this.courses.push(callNum);	
-		
 	}
 	
-	function updateDayArrays(days, variable, operation)
+	function iterateOverDays(days, variable, operation)
 	{
 		for(i=0;i<days.length;i++)
 		{
@@ -508,7 +415,7 @@ $(document).ready(function(){
 			{
 				case 'M':
 					operation(monday, variable, 'M');
-				break;
+					break;
 				case 'T':
 					operation(tuesday, variable, 'T');
 					break;
@@ -577,51 +484,41 @@ $(document).ready(function(){
 				break;
 			}
 		}
-		updateDayArrays('MTWRF', callNum, removeCourseFromDayArray);
-		updateDayArrays('MTWRF', callNum, checkConflicts);
+		iterateOverDays('MTWRF', callNum, removeCourseFromDayArray);
+		iterateOverDays('MTWRF', callNum, checkConflicts);
 		
 		setSectionRowListeners(callNum);
 	};
 	
 	function outputSelectedCourses()
 	{
-		console.log("selectedCourses: ");
+		console.log("SelectedCourses: ");
 		for(var i =0;i<selectedCourses.length; i++)
 		{
 			console.log(i+": "+selectedCourses[i].callNum);
 		}
 	}
 	
+	//When you double click on the calendar, find the free space before and after the location of your click.
 	function findFreeSlot(array, index, day)
 	{
-		console.log('Find free slot');
 		var startIndex = index;
 		var endIndex = index;
 		for(var i=index; i<array.length; i++)
 		{
 			if(array[i].courses.length == 0)
-			{
 				endIndex = i;	
-			}
 			else
-			{
 				break;
-			}
 		}
 		
 		for(var i=index-1; i>=0; i--)
 		{
 			if(array[i].courses.length == 0)
-			{
 				startIndex = i;	
-			}
 			else
-			{
 				break;
-			}
 		}
-		
-		console.log('Start: '+startIndex+', end: '+endIndex);
 		
 		var duration = endIndex - startIndex;
 		
@@ -650,9 +547,9 @@ $(document).ready(function(){
 		
 		var hour = Math.floor((endIndex/12) + 7) 
 		if(hour<10)
-		{
 			hour = '0'+hour;	
-		}
+		
+		
 		var minute = (endIndex%12)*5;
 		if(minute<10)
 		{
@@ -678,19 +575,15 @@ $(document).ready(function(){
 			var index = ((time.slice(0,2)-7)*12) + 6;	
 		}
 		
-		updateDayArrays(day, index, findFreeSlot);
-		search();	
-		console.log('start time: '+time+', day: '+day+', index: '+index);	
+		iterateOverDays(day, index, findFreeSlot);
+		search();
 	});
 	
 	//Reset the listeners that display the selection box over the calendar. This must be done after a selection, to be ready for the next selection.
 	function resetSelectionListeners()
 	{		
 		$('#calendar td').mousedown(function(e)
-		{
-			console.log('target: '+$(this).attr('class'));
-			var target = e.target;
-			
+		{	
 			searchStartTime = e.target.className.split(' ')[0];
 			searchDay = e.target.className.split(' ')[1];
 			
@@ -698,12 +591,8 @@ $(document).ready(function(){
 			var left = $(this).offset().left - $('#calendar').offset().left;
 			$('.selectionBox').remove();
 			
-			console.log('append the selectionBox');
 			$('#calendar').append('<div class="selectionBox '+searchDay+'"></div>');
-			$('.selectionBox').css('top', top);
-			$('.selectionBox').css('left', left);
-			$('.selectionBox').css('width', dayWidth);
-			$('.selectionBox').css('height', '0');
+			$('.selectionBox').css({'top': top, 'left': left, 'width': dayWidth, 'height': '0'});
 	
 			$('#calendar .'+searchDay+', .selectionBox').mousemove(function(e)
 			{
@@ -819,6 +708,10 @@ $(document).ready(function(){
 		resizable:false
 	});
 	
+	$('#mandatorySearch').click(function(){
+		search();
+	});
+	
 	function resetSearchItems()
 	{
 		searchStartTime = '0700';
@@ -859,10 +752,8 @@ $(document).ready(function(){
 		saturday[i]=new CalendarBlock(null);
 		sunday[i]=new CalendarBlock(null);
 	}
+	var filters = new Array()
 	
-	var hour =12;
-	var halfHour = 6;
-	var quarterHour = 3;
 	
 	resetSelectionListeners();
 });
