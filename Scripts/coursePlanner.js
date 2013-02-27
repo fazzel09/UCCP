@@ -66,6 +66,12 @@ $(document).ready(function(){
 		}
 	}
 	
+	function Day()
+	{
+		this.courses = new Array();
+		this.conflicts = new Array();
+	}
+	
 	/* ----- search Functions -----*/
 	function search()
 	{
@@ -136,7 +142,7 @@ $(document).ready(function(){
 	/* Adding a filter to the search */
 	function addFilter( filter )
 	{
-		console.log("adding filter");
+		//console.log("adding filter");
 		// need to add to the filters array as well
 		$('#filters').append('<div class="oneFilter" id="filter-'+filter+'">'+filter+'</div>');
 		$('#filter-'+filter).append('<div class="deleteFilter">X</div>');
@@ -188,12 +194,14 @@ $(document).ready(function(){
 				$('#results .content').append(curRow.courseRow);
 				$('.sectionData.'+courseNum).append(curRow.sectionRow);
 				setSectionRowListeners(curRow.callNum);
+				$('.sectionRow.'+curRow.callNum).css('background', 'rgba('+curRow.color+')');
 			}
 			else
 			{
 				//add a section row
 				$('.sectionData.'+courseNum).append(curRow.sectionRow);
 				setSectionRowListeners(curRow.callNum);
+				$('.sectionRow.'+curRow.callNum).css('background', 'rgba('+curRow.color+')');
 			}
 		}
 		$(".sectionData").hide();
@@ -225,14 +233,6 @@ $(document).ready(function(){
 		}
 		
 		var row = $('#results .sectionRow.'+callNum);
-/*		row.draggable({
-			//revert:true,
-			helper:'clone',
-			connectToSortable: 's',
-		});*/
-		
-		//console.log('enable dragging on the row')
-		//row.draggable('enable');
 		
 		$('.sectionAddButton.'+callNum).attr('cursor', 'pointer');
 		
@@ -315,14 +315,13 @@ $(document).ready(function(){
 		//Find the course corresponding with this callnum
 		var course = findCourse(callNum);
 		
-		//If the course doesn't already exist, add the course to the selected Courses box.
+/*		//If the course doesn't already exist, add the course to the selected Courses box.
 		if(!$('s .sectionRow.'+callNum).is('*'))
 		{
-			console.log('Adding double clicked section');
 			$('s').append(course.sectionRow);	
-		}
+		}*/
 	
-		$('s .sectionRow.'+callNum).css('background', 'rgba('+course.color+')');
+		$('.sectionRow.'+callNum).css('background', 'rgba('+course.color+')');
 		//$('.sectionRow.'+callNum).draggable('disable');
 		$('#results .content .'+callNum).unbind();
 		$('.sectionAddButton.'+callNum).unbind()
@@ -346,8 +345,10 @@ $(document).ready(function(){
 		
 		var blockHeight=(addedCourse.duration.hours*hourHeight) + (addedCourse.duration.minutes/60*hourHeight);
 		
-		iterateOverDays(addedCourse.days, addedCourse, addCourseToDayArray)
-		//For each day the section is on, compute the width
+		//Add the course to the day arrays.
+		iterateOverDays(addedCourse.days, addedCourse, addCourseToDayArray);
+		
+		//For each day the section is on, compute the size, color, etc...
 		for(var i=0;i<addedCourse.days.length;i++)
 		{	
 			var addedCourseDay = addedCourse.days[i];
@@ -360,6 +361,7 @@ $(document).ready(function(){
 				'background':'rgba('+addedCourse.color+')',
 				'top':startPositionY} );
 		}
+		
 		iterateOverDays(addedCourse.days, addedCourse.callNum, checkConflicts);
 		
 		$('.sectionBlock').hover(function(e)
