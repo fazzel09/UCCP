@@ -39,6 +39,7 @@ $(document).ready(function(){
 		var parsed = value.split(':');
 		this.hour = parsed[0];
 		this.minute = parsed[1];
+		this.numeric = parseInt(this.hour+this.minute);
 		if(this.hour > 12)
 		{
 			this.hourString = this.hour-12;
@@ -66,10 +67,27 @@ $(document).ready(function(){
 		}
 	}
 	
-	function Day()
+	function TimeSlot(course)
 	{
 		this.courses = new Array();
-		this.conflicts = new Array();
+		this.courses.push(course);
+		this.startTime = course.startTime.numeric;
+		this.endTime = course.endTime.numeric;	
+		this.sectionBlocks = new Array();	
+		this.sectionBlocks.push(new SectionBlock(course));
+	}
+
+	function Day()
+	{
+		this.timeSlots = new Array();
+		this.sectionBlocks = new Array();
+	}
+	
+	function SectionBlock(course)
+	{
+		this.course = course;
+		this.width = dayWidth;
+		this.conflicts = 0;
 	}
 	
 	/* ----- search Functions -----*/
@@ -385,9 +403,9 @@ $(document).ready(function(){
 	};
 	
 	/* add a new course to the approprate Day Array */
-	function addCourseToDayArray(array, course, notUsed)
+	function addCourseToDayArray(array, course, dayChar)
 	{
-		var startHour = course.startTime.hour;
+/*		var startHour = course.startTime.hour;
 		var startMin = course.startTime.minute;
 		var startIndex = ((course.startTime.hour-7) * 12)+(course.startTime.minute/5);
 		var endIndex = ((course.endTime.hour-7) * 12)+(course.endTime.minute/5);
@@ -395,8 +413,39 @@ $(document).ready(function(){
 		for(var i=startIndex; i<=endIndex; i++)
 		{
 			array[i].courses.push(course.callNum);
+		}*/
+		
+		for(var i=0; i<array.timeSlots.length; i++)
+		{
+			var timeSlot = array.timeSlots[i];
+			var inserted = false;
+			if((course.startTime.numeric >= timeSlot.startTime && course.startTime.numeric <= timeSlot.endTime)||
+				(course.endTime.numeric >= timeSlot.startTime && course.endTime.numeric <= timeSlot.endTime))
+			{
+				inserted = true;
+				if(course.startTime.numeric < timeSlot.startTime)
+				    timeSlot.startTime = course.startTime.numeric;
+				if(course.endTime.numeric > timeSlot.endTime)
+					timeSlot.endTime = course.endTime.numeric;	
+					
+				timeSlot.courses.push(course);
+				timeSlot.sectionBlocks.push(course);
+			}
+		}
+		
+		if(!inserted)
+		{
+			array.timeSlots.push(new TimeSlot(course));	
 		}
 	}
+/*	
+	function addToTimeSlot(timeSlot, course)
+	{
+		for(var i =timeSlot.courses.length-1; i>=0; i++)
+		{
+			if(
+		}
+	}*/
 	
 	// Each element in selectedcourses is a "calendarBlock", it has an array of courses that are currently selected at that particular time.
 	function CalendarBlock(value)
@@ -443,16 +492,61 @@ $(document).ready(function(){
 	}
 	
 	function checkConflicts(dayArray, callNum, day)
-	{
-		for(var i=0; i<dayArray.length; i++)
+	{	
+		for(var i = 0;i< dayArray.timeSlots.length; i++)
 		{
-			var curBlock = dayArray[i]
-			
-			for(var j=0;j<curBlock.courses.length;j++)
+			timeSlot = dayArray.timeSlots[i];
+			var numRows = 0;
+			for(var j=timeSlot.startTime; j<=timeSlot.endTime; j+=5)
 			{
-				$('.sectionBlock.'+curBlock.courses[j]+'.'+day).css('width',dayWidth/curBlock.courses.length);
-				$('.sectionBlock.'+curBlock.courses[j]+'.'+day).css('left',($('.'+day).offset().left - $('#calendar').offset().left)+j*dayWidth/curBlock.courses.length+'px');
-			}		
+				var numConflicts = 0;
+				var conflictedCourses = new Array();
+				for(var k = 0; k<timeSlot.courses.length; k++)
+				{
+					var course = timeSlot.courses[k];
+					if(course.startTime.numeric >= j && j <= course.endTime.numeric)
+						numConflicts++;
+					
+					conflictedCourses.push(course);
+				}
+				for(var k = 0;k<conflictedCourses.length;k++)
+					setSectionBlockConflicts(timeSlot.sectionBlocks, conflictedCourses[k], numConflicts);
+				if(numConflicts > numRows)
+					numRows = numConflicts;
+			}
+			var rowIndex = 0;
+			for(var j = 0; j<timeSlot.sectionBlocks.length; j++)
+			{
+				var sectBlock = timeSlot.sectionBlocks[j];
+				var rowWidth = dayWidth/numRows;
+				var blockWidth = rowWidth * (numRows - sectBlock.conflicts);
+				var left = $('.'+day).position().left+(rowWidth*rowIndex);
+				rowIndex++;
+				if(rowIndex>= numRows)
+					rowIndex = 0;
+				
+				$('.sectionBlock.'+sectBlock.course.callNum+'.'+day).css({
+				'width':rowWidth,
+				'left':left});
+			}
+		}
+		
+		console.log("NumRows: "+numRows);
+	}
+	
+	function setSectionBlockConflicts(sectionBlocks, course, numConflicts)
+	{
+		for(var i = 0; i<sectionBlocks.length; i++)
+		{
+			var sectionBlock = sectionBlocks[i];	
+			if(sectionBlock.course == course)
+			{
+				if(sectionBlock.conflicts < numConflicts)
+				{
+					sectionBlock.conflicts = numConflicts
+				}
+				break;
+			}
 		}
 	}
 	
@@ -736,15 +830,15 @@ $(document).ready(function(){
 	var hourHeight = $('.08').position().top - $('.07').position().top
 	var dayWidth = $('.T').position().left - $('.M').position().left-3;
 	
-	var monday = new Array();
-	var tuesday = new Array();
-	var wednesday = new Array();
-	var thursday = new Array();
-	var friday = new Array();
-	var saturday = new Array();
-	var sunday = new Array();
+	var monday = new Day();
+	var tuesday = new Day();
+	var wednesday = new Day();
+	var thursday = new Day();
+	var friday = new Day();
+	var saturday = new Day();
+	var sunday = new Day();
 	
-	for(var i=0;i<181;i++)
+/*	for(var i=0;i<181;i++)
 	{
 		monday[i]=new CalendarBlock(null);
 		tuesday[i]=new CalendarBlock(null);
@@ -753,7 +847,7 @@ $(document).ready(function(){
 		friday[i]=new CalendarBlock(null);
 		saturday[i]=new CalendarBlock(null);
 		sunday[i]=new CalendarBlock(null);
-	}
+	}*/
 	var filters = new Array()
 	
 	
