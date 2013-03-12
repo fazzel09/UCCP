@@ -86,7 +86,6 @@ $(document).ready(function(){
 	function SectionBlock(course)
 	{
 		this.course = course;
-		this.width = dayWidth;
 		this.conflicts = 0;
 	}
 	
@@ -332,13 +331,7 @@ $(document).ready(function(){
 		$('.sectionOverlay').remove();
 		//Find the course corresponding with this callnum
 		var course = findCourse(callNum);
-		
-/*		//If the course doesn't already exist, add the course to the selected Courses box.
-		if(!$('s .sectionRow.'+callNum).is('*'))
-		{
-			$('s').append(course.sectionRow);	
-		}*/
-	
+
 		$('.sectionRow.'+callNum).css('background', 'rgba('+course.color+')');
 		//$('.sectionRow.'+callNum).draggable('disable');
 		$('#results .content .'+callNum).unbind();
@@ -405,20 +398,11 @@ $(document).ready(function(){
 	/* add a new course to the approprate Day Array */
 	function addCourseToDayArray(array, course, dayChar)
 	{
-/*		var startHour = course.startTime.hour;
-		var startMin = course.startTime.minute;
-		var startIndex = ((course.startTime.hour-7) * 12)+(course.startTime.minute/5);
-		var endIndex = ((course.endTime.hour-7) * 12)+(course.endTime.minute/5);
-		
-		for(var i=startIndex; i<=endIndex; i++)
-		{
-			array[i].courses.push(course.callNum);
-		}*/
-		
+		var inserted = false;
 		for(var i=0; i<array.timeSlots.length; i++)
 		{
 			var timeSlot = array.timeSlots[i];
-			var inserted = false;
+	
 			if((course.startTime.numeric >= timeSlot.startTime && course.startTime.numeric <= timeSlot.endTime)||
 				(course.endTime.numeric >= timeSlot.startTime && course.endTime.numeric <= timeSlot.endTime))
 			{
@@ -429,7 +413,7 @@ $(document).ready(function(){
 					timeSlot.endTime = course.endTime.numeric;	
 					
 				timeSlot.courses.push(course);
-				timeSlot.sectionBlocks.push(course);
+				timeSlot.sectionBlocks.push(new SectionBlock(course));
 			}
 		}
 		
@@ -514,24 +498,74 @@ $(document).ready(function(){
 				if(numConflicts > numRows)
 					numRows = numConflicts;
 			}
-			var rowIndex = 0;
-			for(var j = 0; j<timeSlot.sectionBlocks.length; j++)
-			{
-				var sectBlock = timeSlot.sectionBlocks[j];
-				var rowWidth = dayWidth/numRows;
-				var blockWidth = rowWidth * (numRows - sectBlock.conflicts);
-				var left = $('.'+day).position().left+(rowWidth*rowIndex);
-				rowIndex++;
-				if(rowIndex>= numRows)
-					rowIndex = 0;
+			// var rowIndex = 0;
+			// for(var j = 0; j<timeSlot.sectionBlocks.length; j++)
+			// {
+				// var sectBlock = timeSlot.sectionBlocks[j];
+				// var rowWidth = dayWidth/numRows;
+				// var blockWidth = rowWidth * (numRows - sectBlock.conflicts);
+				// var left = $('.'+day).position().left+(rowWidth*rowIndex);
+				// rowIndex++;
+				// if(rowIndex>= numRows)
+					// rowIndex = 0;
 				
-				$('.sectionBlock.'+sectBlock.course.callNum+'.'+day).css({
-				'width':rowWidth,
-				'left':left});
+				// $('.sectionBlock.'+sectBlock.course.callNum+'.'+day).css({
+				// 'width':rowWidth,
+				// 'left':left});
+			// }
+			var rowWidth = dayWidth/numRows;
+			
+			var timeIndex = timeSlot.startTime;
+			
+			var earliestCourse;
+			var earliestCourseIndex;
+			var rowIndex = 0;
+			
+			var tempArray = copyArray(timeSlot.courses);
+			for(var j = 0; j<numRows; j++)
+			{
+				var earliestTime = timeSlot.endTime;
+				while(true)
+				{
+					earliestCourseIndex = -1;
+					for(var k = 0; k<tempArray.length; k++)
+					{
+						var course = tempArray[k];
+						if(course.startTime.numeric < earliestTime && course.endTime.numeric <= timeSlot.endTime)
+						{
+							earliestCourse = course;
+							earliestTime = earliestCourse.startTime.numeric;
+							earliestCourseIndex = k;
+						}
+					}
+					
+					if(earliestCourseIndex != -1)
+					{
+						tempArray.splice(earliestCourseIndex,1);
+						var rowWidth = dayWidth/numRows;
+						var left = $('.'+day).position().left+(rowWidth*j);
+						
+						$('.sectionBlock.'+earliestCourse.callNum+'.'+day).css({
+						'width':rowWidth,
+						'left':left});
+					}
+					else
+						break;
+				}
 			}
 		}
 		
 		console.log("NumRows: "+numRows);
+	}
+	
+	function copyArray(array)
+	{
+		var tempArray = new Array();
+		for(var i=0;i<array.length;i++)
+		{
+			tempArray[i] = array[i]
+		}
+		return tempArray;
 	}
 	
 	function setSectionBlockConflicts(sectionBlocks, course, numConflicts)
