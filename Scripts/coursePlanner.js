@@ -73,20 +73,12 @@ $(document).ready(function(){
 		this.courses.push(course);
 		this.startTime = course.startTime.numeric;
 		this.endTime = course.endTime.numeric;	
-		this.sectionBlocks = new Array();	
-		this.sectionBlocks.push(new SectionBlock(course));
 	}
 
 	function Day()
 	{
 		this.timeSlots = new Array();
 		this.sectionBlocks = new Array();
-	}
-	
-	function SectionBlock(course)
-	{
-		this.course = course;
-		this.conflicts = 0;
 	}
 	
 	/* ----- search Functions -----*/
@@ -396,40 +388,68 @@ $(document).ready(function(){
 	};
 	
 	/* add a new course to the approprate Day Array */
-	function addCourseToDayArray(array, course, dayChar)
+	function addCourseToDayArray(dayArray, course, dayChar)
 	{
-		var inserted = false;
-		for(var i=0; i<array.timeSlots.length; i++)
+		var inserted = new Array();
+		for(var i=0; i<dayArray.timeSlots.length; i++)
 		{
-			var timeSlot = array.timeSlots[i];
+			var timeSlot = dayArray.timeSlots[i];
 	
 			if((course.startTime.numeric >= timeSlot.startTime && course.startTime.numeric <= timeSlot.endTime)||
-				(course.endTime.numeric >= timeSlot.startTime && course.endTime.numeric <= timeSlot.endTime))
+				(course.endTime.numeric >= timeSlot.startTime && course.endTime.numeric <= timeSlot.endTime)||
+				(course.startTime.numeric < timeSlot.startTime && course.endTime.numeric > timeSlot.endTime))
 			{
-				inserted = true;
-				if(course.startTime.numeric < timeSlot.startTime)
-				    timeSlot.startTime = course.startTime.numeric;
-				if(course.endTime.numeric > timeSlot.endTime)
-					timeSlot.endTime = course.endTime.numeric;	
-					
-				timeSlot.courses.push(course);
-				timeSlot.sectionBlocks.push(new SectionBlock(course));
+				inserted.push(timeSlot);
 			}
 		}
 		
-		if(!inserted)
+		if(inserted.length == 0)
 		{
-			array.timeSlots.push(new TimeSlot(course));	
+			dayArray.timeSlots.push(new TimeSlot(course));	
 		}
+		else
+		{
+			//Add the course to the first timeslot it conflicts with.
+			var masterTimeSlot = inserted[0];
+			if(course.startTime.numeric < masterTimeSlot.startTime)
+				masterTimeSlot.startTime = course.startTime.numeric;
+			if(course.endTime.numeric > masterTimeSlot.endTime)
+				masterTimeSlot.endTime = course.endTime.numeric;	
+				
+			masterTimeSlot.courses.push(course);
+			
+			//Remove timeslot that was inserted into
+			inserted.splice(0, 1);
+			
+			//If the course conflicts with multiple time slots, combine all the time slots.
+			for(var i=0; i<inserted.length; inserted++)
+			{
+				var mergedTimeSlot = inserted[0];
+				
+				//Add all the courses from this timeslot to the master timeslot
+				for(var j=0;j<mergedTimeSlot.courses.length;j++)
+				{
+					masterTimeSlot.courses.push(mergedTimeSlot.courses[j]);
+				}
+				
+				if(mergedTimeSlot.startTime < masterTimeSlot.startTime)
+					masterTimeSlot.startTime = course.startTime.numeric;
+				if(mergedTimeSlot.endTime > masterTimeSlot.endTime)
+					masterTimeSlot.endTime = course.endTime.numeric;	
+			
+				//Remove the merged time slot from the day Array
+				for(var j=0;j<dayArray.timeSlots.length;j++)
+				{
+					if(dayArray.timeSlots[j] == mergedTimeSlot)
+					{
+						dayArray.timeSlots.splice(j,1);
+						break;
+					}
+				}
+			}
+		}
+		
 	}
-/*	
-	function addToTimeSlot(timeSlot, course)
-	{
-		for(var i =timeSlot.courses.length-1; i>=0; i++)
-		{
-			if(
-		}
-	}*/
 	
 	// Each element in selectedcourses is a "calendarBlock", it has an array of courses that are currently selected at that particular time.
 	function CalendarBlock(value)
@@ -477,85 +497,88 @@ $(document).ready(function(){
 	
 	function checkConflicts(dayArray, callNum, day)
 	{	
-		for(var i = 0;i< dayArray.timeSlots.length; i++)
+		//Organize the classes into rows
+		for(var i=0; i<dayArray.timeSlots.length; i++)
 		{
-			timeSlot = dayArray.timeSlots[i];
-			var numRows = 0;
-			for(var j=timeSlot.startTime; j<=timeSlot.endTime; j+=5)
+			var rows = new Array(); //2 Dimensional array, each index contains the callnums of classes in that row index.
+			var curTimeSlot = dayArray.timeSlots[i];
+			var coursesToInsert = copyArray(curTimeSlot.courses);
+			
+			while(coursesToInsert.length > 0)
 			{
-				var numConflicts = 0;
-				var conflictedCourses = new Array();
-				for(var k = 0; k<timeSlot.courses.length; k++)
-				{
-					var course = timeSlot.courses[k];
-					if(course.startTime.numeric >= j && j <= course.endTime.numeric)
-						numConflicts++;
-					
-					conflictedCourses.push(course);
-				}
-				for(var k = 0;k<conflictedCourses.length;k++)
-					setSectionBlockConflicts(timeSlot.sectionBlocks, conflictedCourses[k], numConflicts);
-				if(numConflicts > numRows)
-					numRows = numConflicts;
-			}
-			// var rowIndex = 0;
-			// for(var j = 0; j<timeSlot.sectionBlocks.length; j++)
-			// {
-				// var sectBlock = timeSlot.sectionBlocks[j];
-				// var rowWidth = dayWidth/numRows;
-				// var blockWidth = rowWidth * (numRows - sectBlock.conflicts);
-				// var left = $('.'+day).position().left+(rowWidth*rowIndex);
-				// rowIndex++;
-				// if(rowIndex>= numRows)
-					// rowIndex = 0;
+				//Find the earliest course, to start the row.
+				var earliestCourse = coursesToInsert[0];
+				var earliestCourseIndex = 0;
 				
-				// $('.sectionBlock.'+sectBlock.course.callNum+'.'+day).css({
-				// 'width':rowWidth,
-				// 'left':left});
-			// }
-			var rowWidth = dayWidth/numRows;
-			
-			var timeIndex = timeSlot.startTime;
-			
-			var earliestCourse;
-			var earliestCourseIndex;
-			var rowIndex = 0;
-			
-			var tempArray = copyArray(timeSlot.courses);
-			for(var j = 0; j<numRows; j++)
-			{
-				var earliestTime = timeSlot.endTime;
-				while(true)
+				for(var j=1; j<coursesToInsert.length; j++)
 				{
-					earliestCourseIndex = -1;
-					for(var k = 0; k<tempArray.length; k++)
+					var course=coursesToInsert[j];
+					if(course.startTime.numeric<earliestCourse.startTime.numeric)
 					{
-						var course = tempArray[k];
-						if(course.startTime.numeric < earliestTime && course.endTime.numeric <= timeSlot.endTime)
+						earliestCourse = course;
+						earliestCourseIndex = j;
+					}
+				}
+				
+				//Add earliest course to row array;
+				
+				var row = new Array();
+				row.push(earliestCourse.callNum);
+				
+				//Remove inserted course from coursesToInsertArray
+				coursesToInsert.splice(earliestCourseIndex, 1);
+				
+				//Find any more courses that can still fit in the row.
+				//Append  courses, until row full
+				var earliestStartTime = earliestCourse.endTime.numeric;
+				var earliestClassBeginTime = curTimeSlot.endTime;
+				var found = true;
+				var courseToInsert = null;
+				var courseToInsertIndex = -1;
+				
+				while(earliestStartTime < curTimeSlot.endTime && found)
+				{
+					var found = false;
+					for(var k =0; k<coursesToInsert.length; k++)
+					{
+						var course = coursesToInsert[k];
+						if(course.startTime.numeric > earliestStartTime && course.startTime.numeric < earliestClassBeginTime)
 						{
-							earliestCourse = course;
-							earliestTime = earliestCourse.startTime.numeric;
-							earliestCourseIndex = k;
+							earliestClassBeginTime = course.startTime.numeric;
+							courseToInsert = course;
+							courseToInsertIndex = k;
+							found = true;
 						}
 					}
-					
-					if(earliestCourseIndex != -1)
+				
+					if(found)
 					{
-						tempArray.splice(earliestCourseIndex,1);
-						var rowWidth = dayWidth/numRows;
-						var left = $('.'+day).position().left+(rowWidth*j);
-						
-						$('.sectionBlock.'+earliestCourse.callNum+'.'+day).css({
+						//Add to the row, remove from inserted Courses
+						row.push(courseToInsert.callNum);
+						coursesToInsert.splice(courseToInsertIndex, 1);
+					}
+				}
+				
+				//Row Complete, push row to rows
+				rows.push(row);
+			}
+			
+			//position classes based on row array
+			
+			var rowWidth = dayWidth/rows.length;
+			for(var j=0; j<rows.length; j++)
+			{
+				var curRow = rows[j];
+				for(var k=0; k<curRow.length; k++)
+				{
+					var left = $('.'+day).position().left+(rowWidth*j);
+
+					$('.sectionBlock.'+curRow[k]+'.'+day).css({
 						'width':rowWidth,
 						'left':left});
-					}
-					else
-						break;
 				}
 			}
 		}
-		
-		console.log("NumRows: "+numRows);
 	}
 	
 	function copyArray(array)
@@ -567,36 +590,37 @@ $(document).ready(function(){
 		}
 		return tempArray;
 	}
-	
-	function setSectionBlockConflicts(sectionBlocks, course, numConflicts)
+
+	function removeCourseFromDayArray(dayArray, deletedCourse, day)
 	{
-		for(var i = 0; i<sectionBlocks.length; i++)
+		for(var i=0;i<dayArray.timeSlots.length;i++)
 		{
-			var sectionBlock = sectionBlocks[i];	
-			if(sectionBlock.course == course)
+			var timeSlot = dayArray.timeSlots[i];
+			
+			//Find the timeslot that contains deletedCourse, remove deleted course from Timeslot
+			for(var j=0; j<timeSlot.courses.length; j++)
 			{
-				if(sectionBlock.conflicts < numConflicts)
+				if(timeSlot.courses[j] == deletedCourse)
 				{
-					sectionBlock.conflicts = numConflicts
-				}
-				break;
-			}
-		}
-	}
-	
-	function removeCourseFromDayArray(dayArray, callNum, day)
-	{
-		for(var i=0; i<dayArray.length; i++)
-		{
-			var curBlock = dayArray[i];
-			for(var j=0; j<curBlock.courses.length;j++)
-			{
-				if(curBlock.courses[j] == callNum)
-				{
-					curBlock.courses.splice(j,1);	
+					timeSlot.courses.splice(j,1);
+					break;
 				}
 			}
+			
+			//Get remaining courses, delete timeslot
+			var courses = timeSlot.courses;
+			dayArray.timeSlots.splice(i,1);
+			
+			//Add remaining courses back into the dayArray, need to do this to regenerate the timeSlots correctly.
+			for(var j=0; j<courses.length; j++)
+			{
+				addCourseToDayArray(dayArray, courses[j], null);
+			}
+			
+			//Theoretically, a class will only be in one time slot per day, so break out of loop early.
+			break;
 		}
+		
 	}
 
 	function deleteSelectedCourse(callNum)
@@ -610,12 +634,13 @@ $(document).ready(function(){
 		{
 			if(selectedCourses[i].callNum == callNum)
 			{
+				var deletedCourse = selectedCourses[i];
 				selectedCourses.splice(i,1);
 				break;
 			}
 		}
-		iterateOverDays('MTWRF', callNum, removeCourseFromDayArray);
-		iterateOverDays('MTWRF', callNum, checkConflicts);
+		iterateOverDays(deletedCourse.days, deletedCourse, removeCourseFromDayArray);
+		iterateOverDays(deletedCourse.days, deletedCourse, checkConflicts);
 		
 		setSectionRowListeners(callNum);
 	};
@@ -763,9 +788,6 @@ $(document).ready(function(){
 		//Add a listener on the section block on the calendar to overlay detailed section info.
 		$('.sectionBlock').hover(function(e)
 		{
-			console.log('Hover: '+$(this).attr('class'));
-			console.log('Height: '+$(this).height());
-			
 			var course = findCourse($(this).attr('class').split(' ')[1]);
 			
 			$('#sectionInfoDialog').dialog( "option", "title", course.courseName);
@@ -776,7 +798,6 @@ $(document).ready(function(){
 		},
 		function(e)
 		{
-			console.log('HoverOut');
 			$('#sectionInfoDialog').dialog('close');
 		});
 	}
@@ -790,7 +811,6 @@ $(document).ready(function(){
 			color += Math.round(Math.random() * 155 + 100)+', ';
 		}
 		color += '1'
-		console.log('Color'+color);
 		return color;
 	}
 	
@@ -814,7 +834,7 @@ $(document).ready(function(){
 		checkConflicts(monday, null, 'M' );
 		checkConflicts(tuesday, null, 'T' );
 		checkConflicts(wednesday, null, 'W' );
-		checkConflicts(thursday, null, 'H' );
+		checkConflicts(thursday, null, 'R' );
 		checkConflicts(friday, null, 'F' );
 		checkConflicts(saturday, null, 'S' );
 		checkConflicts(sunday, null, 'U' );
@@ -846,7 +866,7 @@ $(document).ready(function(){
 	{
 		searchStartTime = '0700';
 		searchEndTime = '2200';
-		searchDays = 'MTWHFSU';
+		searchDays = 'MTWRFSU';
 		searchDiscipline = '';
 		searchCollege= '';
 		searchBOK = ''
