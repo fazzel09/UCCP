@@ -8,7 +8,6 @@
   
 <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
 <link rel="stylesheet" type="text/css" href="style.css" />
-<link rel="stylesheet" type="text/css" href="calendar_style.css" />
 <link rel="stylesheet" type="text/css" href="nanoscroller.css"> 
 <title>University of Cincinnati Course Planner
 </title>
@@ -22,10 +21,12 @@ $DB -> connect();
 ?>
 
 <div class="mainwrapper">
-	<div class="menu">
-		<a href="admin.php"> Admin page</a>
-	</div>
-
+	<!--
+        <div class="menu">
+		    <a href="admin.php"> Admin page</a>
+	    </div>
+    -->
+    <div class="title">UC CoursePlanner</div>
 	<div class="midwrapper">
 	<!--
 		<div class="welcomedialog">
@@ -37,7 +38,6 @@ $DB -> connect();
 		
 		Sign in here.
 		</div>
-		
 	-->
     <!--
 	<div class="coursesearch">
@@ -51,8 +51,8 @@ $DB -> connect();
 		year
 	</div>
     -->
-        <div id="calendar_find_courses">
             <!--
+        <div id="calendar_find_courses">
             1. Search Bar (span) - Name, Department, College, Course Number 
             //As one is selected, add it by name (ex: Name: Intro to CS or Department: "Computer Science")
             2. Course Level (Multi-select drag+color)
@@ -68,11 +68,7 @@ $DB -> connect();
                 <div class="content"></div>
                 </div>
             </div>
-        </div>
 	
-   
-
-    
         <div class="schedule">
         <?php require "calendar.php"; ?>
     
