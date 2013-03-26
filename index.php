@@ -9,7 +9,7 @@
 <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
 <link rel="stylesheet" type="text/css" href="style.css" />
 <link rel="stylesheet" type="text/css" href="nanoscroller.css"> 
-<title>University of Cincinnati Course Planner
+<title>UC Course Planner
 </title>
 </head>
 <body>
