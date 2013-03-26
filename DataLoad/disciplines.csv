@@ -1,0 +1,260 @@
+'AADM - Arts Administration',AADM
+'ACCT - Accounting',ACCT
+'AE - Architectural Engineering',AE
+'AEEM - Aerospace Engineering & Engineering Mechanics',AEEM
+'AF - Air Force ROTC',AF
+'AFST - Africana Studies',AFST
+'AIS - Applied Interdisciplinary Studies',AIS
+'AIST - Asian Studies',AIST
+'ALH - Allied Health',ALH
+'AMIT - Advanced Medical Imaging Technology',AMIT
+'ANAN - Advanced Nursing - Nurse Anesthesia',ANAN
+'ANCH - Advanced Nursing - Community Health',ANCH
+'ANNA - Advanced Nursing - Nursing Administration',ANNA
+'ANNP - Advanced Nursing - Nurse Practitioner',ANNP
+'ANPC - Advanced Nursing - Parent Child',ANPC
+'ANPS - Advanced Nursing - Psychiatric',ANPS
+'ANTH - Anthropology',ANTH
+'ANW - Advanced Nursing - Women',ANW
+'ARAB - Arabic Languages and Culture',ARAB
+'ARCH - Architecture',ARCH
+'ARTE - Art Education',ARTE
+'ARTH - Art History',ARTH
+'ARTN - Architectural Technology',ARTN
+'ASL - American Sign Language',ASL
+'ATH - Athletic Training',ATH
+'AVTN - Aviation Technology',AVTN
+'BA - Business Administration',BA
+'BANA - Business Analytics',BANA
+'BE - Biostatistics and Epidemiology',BE
+'BIOL - Biological Sciences',BIOL
+'BLAW - Business Law',BLAW
+'BME - Biomedical Engineering',BME
+'BSN - Bassoon',BSN
+'BTM - Blood Transfusion Medicine',BTM
+'CB - Cell and Molecular Biology',CB
+'CBMK - Cabinet and Furniture Making',CBMK
+'CHE - Chemical Engineering',CHE
+'CHEM - Chemistry',CHEM
+'CHIN - Chinese Languages and Cultures',CHIN
+'CHMU - Chamber Music',CHMU
+'CHTN - Chemical Technology',CHTN
+'CI - Curriculum and Instruction',CI
+'CJ - Criminal Justice',CJ
+'CJTN - Criminal Justice Technology',CJTN
+'CLAR - Clarinet',CLAR
+'CLAS - Classical Civilization',CLAS
+'CLRS - Clinical Research',CLRS
+'CM - Construction Management',CM
+'CMDS - Communication Design',CMDS
+'CMP - Commercial Music Production',CMP
+'CNSL - Counseling',CNSL
+'COMM - Communication',COMM
+'COMP - Music Composition',COMP
+'COND - Conducting',COND
+'CS - Computer Science',CS
+'CSD - Communication Sciences and Disorders',CSD
+'CSST - Computer Systems Support',CSST
+'CT - Cellular Therapies',CT
+'CUL - Culinary Arts',CUL
+'CVE - Civil Engineering',CVE
+'CVTN - Civil and Construction Engineering Technology',CVTN
+'DAAP - Design, Architecture, Art and Planning',DAAP
+'DB - Developmental Biology',DB
+'DBBS - Double Bass',DBBS
+'DHYG - Dental Hygiene',DHYG
+'DNCE - Dance',DNCE
+'DRPF - Dramatic Performance',DRPF
+'DSGN - Design',DSGN
+'ECE - Early Childhood Education',ECE
+'ECED - Economic Education',ECED
+'ECON - Economics',ECON
+'EDLD - Educational Leadership',EDLD
+'EDST - Educational Studies',EDST
+'EECE - Electrical and Computer Engineering',EECE
+'EGFD - Engineering Graduate Fundamentals',EGFD
+'EGTN - Engineering Graphics Technology',EGTN
+'EIH - Environmental and Industrial Hygiene',EIH
+'ELTN - Electronic Technology',ELTN
+'ELTT - Electronic Trades Technology',ELTT
+'EMDT - Electronic Media Technology',EMDT
+'EME - Energy and Materials Engineering',EME
+'EMED - Electronic Media',EMED
+'EMS - Emergency Medical Services',EMS
+'ENED - Engineering Education',ENED
+'ENFD - Engineering Fundamentals',ENFD
+'ENGB - English - British Literature',ENGB
+'ENGC - English - Comparative Literature',ENGC
+'ENGL - English',ENGL
+'ENGR - Engineering',ENGR
+'ENSM - Ensemble',ENSM
+'ENTR - Entrepreneurship/Family Business',ENTR
+'ENV - Environmental Health',ENV
+'ENVE - Environmental Engineering',ENVE
+'ESL - English as a Second Language',ESL
+'EUPH - Euphonium',EUPH
+'EUST - European Studies',EUST
+'EVST - Environmental Studies',EVST
+'FAA - Fine Arts - Art',FAA
+'FAM - Fine Arts - Music',FAM
+'FASH - Fashion Design',FASH
+'FIN - Finance',FIN
+'FLUT - Flute',FLUT
+'FREN - French',FREN
+'FST - Fire Science',FST
+'GC - Genetic Counseling',GC
+'GEOG - Geography',GEOG
+'GEOL - Geology',GEOL
+'GNTD - Graduate Medicine Interdepartmental',GNTD
+'GRCD - Graphic Communication Design',GRCD
+'GRK - Greek',GRK
+'GRMN - German',GRMN
+'GTAR - Classical Guitar',GTAR
+'HARP - Harp',HARP
+'HCA - Healthcare Administration',HCA
+'HCMT - Health Care Management',HCMT
+'HFL - Health, Fitness and Leisure Studies',HFL
+'HIM - Health Information Management',HIM
+'HIST - History',HIST
+'HLSC - Health Sciences',HLSC
+'HLTH - Interdisciplinary Health Education',HLTH
+'HM - Hospitality Management',HM
+'HNPL - Honors Plus',HNPL
+'HNRS - Honors',HNRS
+'HORN - French Horn',HORN
+'HORT - Horticulture',HORT
+'HPE - Health Education',HPE
+'HSC - Harpsichord',HSC
+'HSST - Human Social Services Technology',HSST
+'HVAC - HVAC and Stationary Engineering',HVAC
+'IMM - Immunobiology',IMM
+'INDL - Industrial Design',INDL
+'INTB - International Business',INTB
+'INTD - Interior Design',INTD
+'INTR - Interdisciplinary',INTR
+'IS - Information Systems',IS
+'IT - Information Technology',IT
+'ITAL - Italian',ITAL
+'JAPN - Japanese Languages and Cultures',JAPN
+'JOUR - Journalism',JOUR
+'JUDC - Judaic Studies',JUDC
+'JZDB - Jazz Double Bass',JZDB
+'JZGT - Jazz Guitar',JZGT
+'JZPA - Jazz Piano',JZPA
+'JZPR - Jazz Percussion',JZPR
+'JZST - Jazz Studies',JZST
+'JZSX - Jazz Saxophone',JZSX
+'JZTB - Jazz Trombone',JZTB
+'JZTP - Jazz Trumpet',JZTP
+'JZVO - Jazz Voice',JZVO
+'LATN - Latin',LATN
+'LSLS - Literacy and Second Language Studies',LSLS
+'MA - Medical Assisting',MA
+'MATH - Mathematics',MATH
+'MCBP - Molecular, Cellular and Biochemical Pharmacology',MCBP
+'MCP - Molecular & Cellular Physiology',MCP
+'MDAS - Medical Assistant',MDAS
+'MDL - Middle Childhood Education',MDL
+'MECH - Mechanical Engineering',MECH
+'MES - Middle Eastern Studies',MES
+'MET - Mechanical Engineering Technologies',MET
+'METL - Metallurgical Engineering',METL
+'MFTN - Manufacturing Engineering Technology',MFTN
+'MG - Molecular Gen, Biochem, Microbiol & Immunology',MG
+'MGMT - Management',MGMT
+'MKTG - Marketing',MKTG
+'MLIT - Music Literature',MLIT
+'MLSC - Medical Laboratory Science',MLSC
+'MLTI - Multidisciplinary',MLTI
+'MP - Medical Physics',MP
+'MS - Military Science',MS
+'MTEN - Materials Engineering',MTEN
+'MTSC - Materials Science',MTSC
+'MUED - Music Education',MUED
+'MUHS - Music History',MUHS
+'MUST - Musical Theater',MUST
+'NBSN - Baccalaureate Nursing',NBSN
+'NDNP - Doctorate of Nursing Practice',NDNP
+'NPHD - PhD in Nursing',NPHD
+'NS - Neuroscience',NS
+'NSTN - Nursing Technology',NSTN
+'NURS - Nursing',NURS
+'NUTR - Nutrition Sciences',NUTR
+'OATN - Office Administration Technology',OATN
+'OBOE - Oboe',OBOE
+'OCCM - Occupational Medicine',OCCM
+'OLHR - Organizational Leadership/Human Resources',OLHR
+'OM - Operations Management',OM
+'OPRA - Opera',OPRA
+'ORGN - Organ',ORGN
+'OSE - Occupational Safety and Ergonomics',OSE
+'PADM - Pharmacy-Administrative Science',PADM
+'PARA - Paralegal Studies',PARA
+'PBIO - Pharmacy-Biological Science',PBIO
+'PCEU - Pharmacy-Pharmaceutics',PCEU
+'PD - Professional Development',PD
+'PERC - Percussion',PERC
+'PH - Public Health',PH
+'PHCS - Pharmacy-Health Care Systems',PHCS
+'PHDD - Pharmaceutical Drug Development',PHDD
+'PHID - Pharmacy-Interdisciplinary',PHID
+'PHIL - Philosophy',PHIL
+'PHPE - Pharmacy-Professional Experience',PHPE
+'PHRX - Pharmacy-Pharmacy Practice',PHRX
+'PHTG - Photography',PHTG
+'PHTH - Pharmacy-Therapeutics',PHTH
+'PHYS - Physics',PHYS
+'PIAN - Piano',PIAN
+'PLAN - Planning',PLAN
+'PMM - Pathobiology and Molecular Medicine',PMM
+'PMSN - Pre-Master's',PMSN
+'POL - Political Science',POL
+'PORT - Portuguese',PORT
+'PRFS - Professional Seminar',PRFS
+'PSCI - Pharmacy-Pharmaceutical Sciences',PSCI
+'PSTP - Physician Scientist Training Program',PSTP
+'PSYC - Psychology',PSYC
+'PT - Physical Therapy',PT
+'PTA - Physical Therapist Assistant',PTA
+'RDSC - Radiation Science',RDSC
+'RDTH - Radiation Therapy Technology',RDTH
+'RDTN - Radiologic Technology',RDTN
+'RE - Real Estate',RE
+'READ - Reading',READ
+'RELG - Religious Studies',RELG
+'RESP - Respiratory Care',RESP
+'RLL - Romance Languages and Literature',RLL
+'RT - Respiratory Therapy',RT
+'RUSS - Russian',RUSS
+'SACN - Substance Abuse Counseling',SACN
+'SAID - Architecture and Interior Design',SAID
+'SAX - Saxophone',SAX
+'SEC - Secondary Education',SEC
+'SLA - Second Language Acquisition',SLA
+'SLCE - Service Learning and Civic Engagement',SLCE
+'SLI - Signed Language Interpreting',SLI
+'SMGT - Sports Management',SMGT
+'SOC - Sociology',SOC
+'SPAN - Spanish',SPAN
+'SPED - Special Education',SPED
+'SPSY - School Psychology',SPSY
+'ST - Surgical Technician',ST
+'STAT - Statistics',STAT
+'SW - Social Work',SW
+'SWAH - Swahili',SWAH
+'THPR - Theater Production',THPR
+'THRY - Music Theory',THRY
+'TOX - Toxicology',TOX
+'TRB - Trombone',TRB
+'TRP - Trumpet',TRP
+'TSCI - Teaching Science',TSCI
+'TUBA - Tuba',TUBA
+'UEL - Urban Educational Leadership',UEL
+'URBN - Urban Administration and Urban Studies',URBN
+'VC - Violoncello',VC
+'VETN - Veterinary Technology',VETN
+'VLA - Viola',VLA
+'VLN - Violin',VLN
+'VOIC - Voice',VOIC
+'WGS - Women's, Gender and Sexuality Studies',WGS
+'WLTN - Welding Technology',WLTN
