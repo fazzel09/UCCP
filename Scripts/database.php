@@ -81,6 +81,18 @@ class DB{
 		
 		echo json_encode($rows);
 	}
+	
+	public function autoComplete($term)
+	{
+		$sql = "Select autocomplete.type, autocomplete.desc, autocomplete.searchKey FROM autocomplete WHERE autocomplete.desc LIKE '%".$term."%' OR autocomplete.searchKey LIKE '%".$term."%'";
+		$result = mysql_query($sql) or die (mysql_error());
+		
+		while($row = mysql_fetch_array($result)){
+			$rows[] = $row;
+		}
+		
+		echo json_encode($rows);
+	}
 }
 
 $DB = new DB();
@@ -96,6 +108,10 @@ if(isset($_POST['searchSections']))
 if(isset($_POST['selectionSearchDay']) && isset($_POST['searchStartTime']) && isset($_POST['searchEndTime']))
 {	
 	$DB->selectionSearch($_POST['selectionSearchDay'], $_POST['searchStartTime'], $_POST['searchEndTime'] );	
+}
+if(isset($_POST['autoComplete']))
+{
+	$DB->autocomplete($_POST['autoComplete']);	
 }
 
 ?>

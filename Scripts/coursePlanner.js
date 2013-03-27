@@ -1,6 +1,7 @@
 $(document).ready(function(){
 	$('body').disableSelection();
 	$('#results').nanoScroller();
+	$('.ui-autocomplete').nanoScroller();
 	
 	/* ----- Data types used for local course information ----- */
 	function Course(value)
@@ -802,7 +803,7 @@ $(document).ready(function(){
 		});
 	}
 	
-	
+
 				
 	function getRandomColor() {
 		var letters = '0123456789ABCDEF'.split('');
@@ -856,6 +857,66 @@ $(document).ready(function(){
 		height:150,
 		width:230,
 		resizable:false
+	});
+	
+	$.widget( "custom.catcomplete", $.ui.autocomplete, 
+	{
+		_renderMenu: function( ul, items ) 
+		{
+			var that = this, currentCategory = "";
+			$.each( items, function( index, item ) 
+			{
+				if ( item.category != currentCategory ) 
+				{
+					ul.append( "<li class='ui-autocomplete-category'>" + item.category + "</li>" );
+					currentCategory = item.category;
+				}
+				that._renderItemData( ul, item );
+			});
+		}
+		
+  });
+	
+		var autocompleteCategories = ["Attributes", "Campuses", "Colleges", "Disciplines", "Formats", "General Education"];
+	$('#searchBox').catcomplete({
+		minLength:2,
+		open: function(event, ui){
+			
+			console.log("open");
+		},
+		source: function( request, response)
+		{
+			console.log("Term:" + request.term);
+			$.ajax({
+			type:'POST',
+			url:'Scripts/database.php',
+			dataType:'json',
+			data:{
+				autoComplete:request.term
+			},
+			success:function( data ) 
+			{
+				response( $.map( data, function( item ) 
+				{
+					return {
+					label: item[1],
+					value: item[1],
+					category: autocompleteCategories[ parseInt(item[0])-1]
+				  	}
+				}));
+			},
+			error:function(xhr, ajaxOptions, thrownError){
+				if(xhr.status == 200)
+				{
+					alert("No results found");
+				}else
+				
+				alert("Search failed. Response status: "+xhr.status);
+			}
+			
+		});
+		
+		}
 	});
 	
 	$('#mandatorySearch').click(function(){

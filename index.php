@@ -1,7 +1,7 @@
 <html>
 <head>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
-<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>
 <script type="text/javascript" src="Scripts/coursePlanner.js"></script>
 <script type="text/javascript" src="Scripts/jquery.nanoscroller.min.js"></script>
 
@@ -90,6 +90,11 @@ $DB -> connect();
     <input type="button" id="selectionSearch" value="search">
 </div>
 
+
+<div class="ui-widget">
+  <label for="tags">Tags: </label>
+  <input id="tags" />
+</div>
 <div id="sectionInfoDialog">
 
 </div>
