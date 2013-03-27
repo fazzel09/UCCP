@@ -217,7 +217,24 @@ $(document).ready(function(){
 		$(".sectionData").hide();
 		
 		$('#results').nanoScroller();
-		$('.showSections').toggle(
+		
+		$('.showSections').click(function(e)
+		{
+			if($(this).hasClass('expanded'))
+			{
+				$(".sectionData."+event.target.className.split(' ')[1]).hide();
+				$(this).toggleClass('expanded');
+				$('#results').nanoScroller();
+			}
+			else
+			{
+				$(".sectionData."+event.target.className.split(' ')[1]).show();
+				$(this).toggleClass('expanded');
+				$('#results').nanoScroller();
+			}
+		});
+		
+/*		$('.showSections').toggle(
 		function(event){
 			$(".sectionData."+event.target.className.split(' ')[1]).show();
 			$(this).toggleClass('expanded');
@@ -227,7 +244,7 @@ $(document).ready(function(){
 			$(".sectionData."+event.target.className.split(' ')[1]).hide();
 			$(this).toggleClass('expanded');
 			$('#results').nanoScroller();
-		});
+		});*/
 	}
 
 	/*Set all the listeners on the section rows in the results list*/
