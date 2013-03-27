@@ -485,6 +485,21 @@ td
 	display:none;
 }
 
+  .ui-autocomplete-category {
+    font-weight: bold;
+    padding: .2em .4em;
+    margin: .8em 0 .2em;
+    line-height: 1.0;
+  	text-align:right;
+	border-bottom:1px solid black
+  }
+  
+  .ui-autocomplete{
+	max-width: 300px;
+	max-height: 400px;
+	overflow:hidden;  
+  }
+  
 .nano .content { padding: 10px; }
 .nano .pane   { background: #888; }
 .nano .slider { background: #111; }
