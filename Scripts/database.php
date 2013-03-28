@@ -84,7 +84,7 @@ class DB{
 	
 	public function autoComplete($term)
 	{
-		$sql = "Select autocomplete.type, autocomplete.desc, autocomplete.searchKey FROM autocomplete WHERE autocomplete.desc LIKE '%".$term."%' OR autocomplete.searchKey LIKE '%".$term."%'";
+		$sql = "Select autocomplete.type, autocomplete.desc, autocomplete.searchKey, autocomplete.disp FROM autocomplete WHERE autocomplete.desc LIKE '%".$term."%' OR autocomplete.searchKey LIKE '%".$term."%'";
 		$result = mysql_query($sql) or die (mysql_error());
 		
 		while($row = mysql_fetch_array($result)){

@@ -60,10 +60,15 @@ $DB -> connect();
             4. "Find Courses" button
             -->
             <div class="searchresults">
-		        <div class="searchbar" style="display:none">Search for course name, department, college, etc..</div>
-		        <input type="text" name="searchInput" id="searchBox">
-		        <input type="button" id="mandatorySearch" value="">
-		        <div id="filters"></div>
+            	<div class="searchBar">
+                    <input type="text" name="searchInput" id="searchBox">
+                    <input type="button" id="mandatorySearch" value="">
+                    <div id="filters">
+                        <div id="clearFilters">clear all</div>
+                        <div id="filterList"></div>
+                    	<div id="filterFooter"></div>
+                    </div>
+                </div>
 		        <div id="results" class="nano">
                 <div class="content"></div>
                 </div>
@@ -84,18 +89,7 @@ $DB -> connect();
 
 </div>
 
-<div id="searchDialog">
-	Times: <input type="text" name="times" id="selectionSearchTimes"><br/>
-    Days: <input type="text" id="selectionSearchDays" name="days"><br/>
-    <input type="button" id="selectionSearch" value="search">
-</div>
-
-
-<div class="ui-widget">
-  <label for="tags">Tags: </label>
-  <input id="tags" />
-</div>
-<div id="sectionInfoDialog">
+<div id="sectInfoDialog">
 
 </div>
 
