@@ -4,17 +4,24 @@ $(document).ready(function(){
 	$('.ui-autocomplete').nanoScroller();
 	
 	/* ----- Data types used for local course information ----- */
-	function Course(value)
+	function Course(name,num,callNum,section,days,startTime,endTime,creditHours, description, isUnderGrad, isGrad, instructor, startDate, endDate)
 	{
-		this.courseName = value['CourseName'];
-		this.courseNum = value['courseNum'];	
-		this.callNum = value['callNum'];
-		this.section = value['sectNum'];
-		this.days = value['days'];
-		this.startTime = new Time( value['start_time']);
-		this.endTime = new Time( value['end_time']);
+		this.courseName = name;
+		this.courseNum = num;	
+		this.callNum = callNum;
+		this.section = section;
+		this.days = days;
+		this.startTime = new Time( startTime);
+		this.endTime = new Time( endTime );
 		this.duration = new Duration(this.startTime, this.endTime);
 		this.color = getRandomColor();
+		this.creditHours = creditHours;
+		this.description = description;
+		this.startDate = startDate;
+		this.endDate = endDate;
+		this.isUnderGrad = isUnderGrad;
+		this.isGrad = isGrad;
+		this.instructor = instructor;
 		
 		// These are the rows in the search results list.
 		this.courseRow = '<div class="courseRow '+this.courseNum+'"><div class="courseInfo">'+this.courseNum+':'+this.courseName+'</div><img class="showSections '
@@ -82,6 +89,22 @@ $(document).ready(function(){
 		this.sectionBlocks = new Array();
 	}
 	
+	function jsonCallback(data)
+	{
+		console.log("Callback");	
+	}
+	function buildRequest()
+	{
+		var request = "https://webservices-webdev2.uc.edu/CoursePlanner/CoursePlannerService.svc/GetCoursePlanner?termID='2013B03'"	
+		for(var i=0; i<filterArray.length; i++)
+		{
+			var filter = filterArray[i];
+			
+			request+="&"+searchKeys[filter[0]]+"='"+filter[1]+"'";	
+		}
+		
+		return request;
+	}
 	/* ----- search Functions -----*/
 	function search()
 	{
@@ -121,41 +144,47 @@ $(document).ready(function(){
 		{
 			searchEndTime = searchEndTime.substring(0, 2) + ':' + searchEndTime.substring(2, searchEndTime.length)
 		}
+			
+		var request = new XMLHttpRequest();
 		
-		console.log('start: '+searchStartTime+', end: '+searchEndTime);
-		$.ajax({
-			type:'POST',
-			url:'Scripts/database.php',
-			dataType:'json',
-			data:{
-				search:$('#searchBox').val(),
-				days:searchDays,
-				startTime:searchStartTime,
-				endTime:searchEndTime,
-				discipline:searchDiscipline,
-				college:searchCollege,
-				bok:searchBOK
-			},
-			success:function(data){
-				console.log("Success");
-				generateArrays(data);
-				addFilter({
-					category:null, 
-					disp:$('#searchBox').val(), 
-					key:$('#searchBox').val()
-					});
-				$('#searchBox').val("");
-				updateResultsList(data);
-			},
-			error:function(xhr, ajaxOptions, thrownError){
-				if(xhr.status == 200)
+		request.onreadystatechange = function() {
+			if (request.readyState == 4) 
+			{
+				searchResults = new Array();
+				parser=new DOMParser();
+ 			 	var xmlDoc=parser.parseFromString(request.responseText,"text/xml");
+				console.log(xmlDoc);
+
+				$(xmlDoc).find('element').each(function()
 				{
-					alert("No results found");
-				}else
+					var course = new Course(
+						$(this).find('AbbreviatedTitle').text(),
+						$(this).find('CourseNumber').text(),
+						$(this).find('CallNumber').text(),
+						$(this).find('SectionNumber').text(),
+						$(this).find('DaysOfTheWeek').text(),
+						$(this).find('MeetingStartTime').text(),
+						$(this).find('MeetingStopTime').text(),
+						$(this).find('CreditHourMinimum').text(),
+						$(this).find('Descript').text(),
+						$(this).find('IsUndergraduate').text(),
+						$(this).find('IsGraduate').text(),
+						$(this).find('InstructorName').text(),
+						$(this).find('BeginDate').text(),
+						$(this).find('EndDate').text()
+					);
+					
+					searchResults.push(course);
+				});
 				
-				alert("Search failed. Response status: "+xhr.status);
+				updateResultsList();
 			}
-		});
+		}
+		var URL = buildRequest();
+		console.log(URL);
+		request.open("GET",URL, true);
+		request.send();
+		
 		resetSearchItems();		
 	}
 	$('#filters').hide();
@@ -1015,6 +1044,8 @@ $(document).ready(function(){
   });
 	
 		var autocompleteCategories = ["Attributes", "Campuses", "Colleges", "Disciplines", "Formats", "General Education"];
+		
+		var searchKeys = ["attributeCode","campusCode","collegeCode","disciplineCode","formatCode","genedCode"];
 	$('#searchBox').catcomplete({
 		minLength:2,
 		select: function(event, ui)
