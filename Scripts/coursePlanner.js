@@ -85,6 +85,11 @@ $(document).ready(function(){
 	/* ----- search Functions -----*/
 	function search()
 	{
+		if($('#searchBox').val()=="")
+		{
+			alert("Don't leave the search results blank, you'll eff my shit up brah. (Enter a space if you really wanna see everything.)");	
+			return;
+		}
 		$('.selectionBox').css('opacity','.5');
 		if(!searchStartTime)
 		{
@@ -134,7 +139,12 @@ $(document).ready(function(){
 			success:function(data){
 				console.log("Success");
 				generateArrays(data);
-				addFilter($('#searchBox').val());
+				addFilter({
+					category:null, 
+					disp:$('#searchBox').val(), 
+					key:$('#searchBox').val()
+					});
+				$('#searchBox').val("");
 				updateResultsList(data);
 			},
 			error:function(xhr, ajaxOptions, thrownError){
@@ -148,20 +158,77 @@ $(document).ready(function(){
 		});
 		resetSearchItems();		
 	}
+	$('#filters').hide();
+	var filterArray = new Array();
 	
 	/* Adding a filter to the search */
-	function addFilter( filter )
+	function addFilter( item )
 	{
-		//console.log("adding filter");
-		// need to add to the filters array as well
-		$('#filters').append('<div class="oneFilter" id="filter-'+filter+'">'+filter+'</div>');
-		$('#filter-'+filter).append('<div class="deleteFilter">X</div>');
-		$('#filter-'+filter).find('.deleteFilter').click(function(e)
+		$('#searchBox').val("");
+		for(var i=0; i<filterArray.length; i++)
+		{
+			if(item.key == filterArray[i][1])
 			{
-				$('#filter-'+filter).remove();
-				//need to remove from the filters array as well.
-			});
+				alert("Filter already added");
+				
+				return;	
+			}
+		}
+		var filter = new Array();
+		var key = item.key;
+		var label = item.label;
+		var cat = item.category;
+		var filterRow = '<div class="filterRow '+key+'">'+item.disp+'<div class="deleteFilter">x</div></div>';
+
+		$('#filterList').append(filterRow);
+		
+		filter.push(item.category, item.key);
+		filterArray.push(filter);
+
+		$('#filters').show();
+		
+		resizeResults();
+		
+		$('.deleteFilter').unbind();
+		$('.deleteFilter').click(function(event)
+		{
+			var className = event.target.parentElement.className.split(' ')[1];
+			for(var i=0; i<filterArray.length;i++)
+			{
+				if(filterArray[i][1] == className)
+				{
+					$('.filterRow.'+className).remove();
+					filterArray.splice(i,1);
+					break;
+				}
+			}
+			
+			if(filterArray.length == 0)
+			{
+				$('#filters').hide();	
+			}
+		});
+		
+		$('#clearFilters').unbind();
+		$('#clearFilters').click(function(event)
+		{
+			$('.filterRow').remove();
+
+			filterArray = new Array();
+			$('#filters').hide();
+		});
+		
 	}
+	
+	function resizeResults()
+	{
+		var height = $('.searchresults').height() - $('.searchBar').height();
+		$('#results').height(height+'px');
+		$('#results').nanoScroller();	
+	}
+	
+	
+
 	
 	/* ----- Selection functions, picking time slots on Calendar ----- */
 	
@@ -392,16 +459,19 @@ $(document).ready(function(){
 			
 			var course = findCourse($(this).attr('class').split(' ')[1]);
 			
-			$('#sectionInfoDialog').dialog( "option", "title", course.courseName);
-			$('#sectionInfoDialog').html(course.detailedSectionInfo);
-			$('#sectionInfoDialog').dialog( "option", "position", [e.pageX+20,$(this).offset().top +$(this).height() - $(window).scrollTop()+20] );
-			$('#sectionInfoDialog').dialog('open');
-			
+			$('#sectInfoDialog').dialog( "option", "title", course.courseName);
+			$('#sectInfoDialog').html(course.detailedSectionInfo);
+			$('#sectInfoDialog').dialog( "option", "position", [e.pageX+20,$(this).offset().top +$(this).height() - $(window).scrollTop()+20] );
+			$('#sectInfoDialog').dialog('open');
+			//$('#sectInfoDialog').show();
+			$('.ui-dialog').show();
 		},
 		function(e)
 		{
 			console.log('HoverOut');
-			$('#sectionInfoDialog').dialog('close');
+			//$('#sectInfoDialog').dialog('close');
+			//$('#sectInfoDialog').dialog('close');
+			$('.ui-dialog').hide();
 		});
 	};
 	
@@ -615,16 +685,23 @@ $(document).ready(function(){
 		{
 			var timeSlot = dayArray.timeSlots[i];
 			
+			var found = false;
+			
 			//Find the timeslot that contains deletedCourse, remove deleted course from Timeslot
 			for(var j=0; j<timeSlot.courses.length; j++)
 			{
-				if(timeSlot.courses[j] == deletedCourse)
+				if(timeSlot.courses[j].callNum == deletedCourse.callNum)
 				{
 					timeSlot.courses.splice(j,1);
+					found = true;
 					break;
 				}
 			}
 			
+			if(!found)
+			{
+				continue;
+			}
 			//Get remaining courses, delete timeslot
 			var courses = timeSlot.courses;
 			dayArray.timeSlots.splice(i,1);
@@ -643,7 +720,8 @@ $(document).ready(function(){
 
 	function deleteSelectedCourse(callNum)
 	{
-		$('#sectionInfoDialog').dialog('close');
+		$('.ui-dialog').hide();
+		$('s .sectionRow.'+callNum+', .sectionBlock.'+callNum).hide();
 		$('s .sectionRow.'+callNum+', .sectionBlock.'+callNum).remove();
 		//$('.sectionBlock.'+callNum).remove();
 		$('.sectionRow.'+callNum).toggleClass('disabled', false);
@@ -673,31 +751,60 @@ $(document).ready(function(){
 	}
 	
 	//When you double click on the calendar, find the free space before and after the location of your click.
-	function findFreeSlot(array, index, day)
+	function findFreeSlot(array, time, day)
 	{
-		var startIndex = index;
-		var endIndex = index;
-		for(var i=index; i<array.length; i++)
+		if(time.length == 2)
 		{
-			if(array[i].courses.length == 0)
-				endIndex = i;	
-			else
-				break;
+			time+="00"
 		}
 		
-		for(var i=index-1; i>=0; i--)
+		if(time[0] == 0)
 		{
-			if(array[i].courses.length == 0)
-				startIndex = i;	
-			else
-				break;
+			time = parseInt(time.slice(1,4));
 		}
 		
-		var duration = endIndex - startIndex;
+		//Check if clicked in an existing timeslot
+		for(var i=0; i<array.timeSlots.length;i++)
+		{
+			var timeSlot = array.timeSlots[i];
+			if(timeSlot.startTime<time && timeSlot.endTime>time)
+			{
+				return;	
+			}
+		}
 		
-		var height = duration/12 * hourHeight;
+		//find the earliest start time, up to time && the latest end time, up to time.
+		var startTime = 700;
+		var endTime = 2200;
+		for(var i=0; i<array.timeSlots.length; i++)
+		{
+			var timeSlot = array.timeSlots[i];
+			if(timeSlot.endTime >= startTime && timeSlot.endTime <= time)
+			{
+				startTime = timeSlot.endTime;	
+			}
+			
+			if(timeSlot.startTime<= endTime && timeSlot.startTime >= time)
+			{
+				endTime = timeSlot.startTime
+			}
+		}
+		
+		//compute duration of timeslot
+		var hours = Math.floor(endTime/100)-Math.floor(startTime/100);
+		var mins = (endTime%100) - (startTime%100);
+		if(mins < 0)
+		{
+			mins += 60;
+			hours --;
+		}
+		var durationDecimal = hours + (mins/60);
+		var startTimeDecimal = Math.floor(startTime/100) + (startTime%100/60);
+		//var duration = endIndex - startIndex;
+		
+		var height = (durationDecimal*hourHeight);
 		var left = $('.'+day).position().left+'px';
-		var top = (startIndex/12*hourHeight) +($('.07.M').position().top);
+		var top = ((startTimeDecimal-7)*hourHeight) +($('.07.M').position().top);
 		$('.selectionBox').remove();
 		$('#calendar').append('<div class="selectionBox '+day+'"></div>');
 		$('.selectionBox').css('top', top);
@@ -705,33 +812,47 @@ $(document).ready(function(){
 		$('.selectionBox').css('width', dayWidth);
 		$('.selectionBox').css('height', height);
 		
-		searchDay = day;
-		var hour = Math.floor((startIndex/12) + 7) 
-		if(hour<10)
-		{
-			hour = '0'+hour;	
-		}
-		var minute = (startIndex%12)*5;
-		if(minute<10)
-		{
-			minute = '0'+minute;
-		}
-		searchStartTime = hour +''+ minute;
-		
-		var hour = Math.floor((endIndex/12) + 7) 
-		if(hour<10)
-			hour = '0'+hour;	
-		
-		
-		var minute = (endIndex%12)*5;
-		if(minute<10)
-		{
-			minute = '0'+minute;
-		}
-		
-		searchEndTime = hour +''+minute;
-		
+		searchStartTime = String(startTime);
+		searchEndTime = String(endTime);
 		console.log('startTime: '+searchStartTime+', '+searchEndTime);
+		
+		addTimeSlotFilter();
+	}
+	
+	function addTimeSlotFilter()
+	{
+		var labelString;
+		var key;
+		
+		if(searchStartTime.length==3)
+		{
+			searchStartTime = "0"+searchStartTime;   
+		}
+		if(searchEndTime.length==3)
+		{
+			searchEndTime = "0"+searchStartTime;   
+		}
+		
+		if(searchStartTime.length < 3)
+		{
+			searchStartTime = searchStartTime + "00";
+		}
+		
+		if(searchEndTime.length < 3)
+		{
+			searchEndTime = searchEndTime + "00";	
+		}
+		
+		labelString = [searchStartTime.slice(0, 2), ':', searchStartTime.slice(2)].join('')+"-"+[searchEndTime.slice(0, 2), ':', searchEndTime.slice(2)].join('');
+		
+		console.log(labelString);
+		addFilter({
+		category:"timeSlot", 
+		disp:labelString, 
+		key:searchStartTime+"-"+searchEndTime
+		});	
+		
+		$('.selectionBox').css('opacity',.5);
 	}
 	
 	$('#calendar table').dblclick(function(e)
@@ -748,8 +869,8 @@ $(document).ready(function(){
 			var index = ((time.slice(0,2)-7)*12) + 6;	
 		}
 		
-		iterateOverDays(day, index, findFreeSlot);
-		search();
+		iterateOverDays(day, time, findFreeSlot);
+		//search();
 	});
 	
 	//Reset the listeners that display the selection box over the calendar. This must be done after a selection, to be ready for the next selection.
@@ -791,7 +912,7 @@ $(document).ready(function(){
 				resetSelectionListeners();
 				if(searchStartTime != searchEndTime)
 				{
-					search();	
+					addTimeSlotFilter();
 				}
 			});
 			
@@ -808,20 +929,18 @@ $(document).ready(function(){
 		{
 			var course = findCourse($(this).attr('class').split(' ')[1]);
 			
-			$('#sectionInfoDialog').dialog( "option", "title", course.courseName);
-			$('#sectionInfoDialog').html(course.detailedSectionInfo);
-			$('#sectionInfoDialog').dialog( "option", "position", [$(this).offset().left+20,$(this).offset().top +$(this).height() - $(window).scrollTop()+20] );
-			$('#sectionInfoDialog').dialog('open');
+			$('#sectInfoDialog').dialog( "option", "title", course.courseName);
+			$('#sectInfoDialog').html(course.detailedSectionInfo);
+			$('#sectInfoDialog').dialog( "option", "position", [$(this).offset().left+20,$(this).offset().top +$(this).height() - $(window).scrollTop()+20] );
+			$('#sectInfoDialog').dialog('open');
 			
 		},
 		function(e)
 		{
-			$('#sectionInfoDialog').dialog('close');
+			$('#sectInfoDialog').dialog('close');
 		});
 	}
-	
-
-				
+					
 	function getRandomColor() {
 		var letters = '0123456789ABCDEF'.split('');
 		var color = '';
@@ -868,7 +987,7 @@ $(document).ready(function(){
 		close:function(){$('.selectionBox').remove();}
 	});
 	
-	$('#sectionInfoDialog').dialog({
+	$('#sectInfoDialog').dialog({
 		autoOpen:false,
 		modal:false,
 		height:150,
@@ -883,10 +1002,11 @@ $(document).ready(function(){
 			var that = this, currentCategory = "";
 			$.each( items, function( index, item ) 
 			{
-				if ( item.category != currentCategory ) 
+				var itemCategory = autocompleteCategories[item.category];
+				if ( itemCategory != currentCategory ) 
 				{
-					ul.append( "<li class='ui-autocomplete-category'>" + item.category + "</li>" );
-					currentCategory = item.category;
+					ul.append( "<li class='ui-autocomplete-category'>" + itemCategory + "</li>" );
+					currentCategory = itemCategory;
 				}
 				that._renderItemData( ul, item );
 			});
@@ -897,10 +1017,12 @@ $(document).ready(function(){
 		var autocompleteCategories = ["Attributes", "Campuses", "Colleges", "Disciplines", "Formats", "General Education"];
 	$('#searchBox').catcomplete({
 		minLength:2,
-		open: function(event, ui){
-			
-			console.log("open");
+		select: function(event, ui)
+		{
+			addFilter(ui.item);
+			event.preventDefault();
 		},
+		
 		source: function( request, response)
 		{
 			console.log("Term:" + request.term);
@@ -917,20 +1039,12 @@ $(document).ready(function(){
 				{
 					return {
 					label: item[1],
-					value: item[1],
-					category: autocompleteCategories[ parseInt(item[0])-1]
+					category: parseInt(item[0])-1,
+					key: item[2],
+					disp: item[3]
 				  	}
 				}));
-			},
-			error:function(xhr, ajaxOptions, thrownError){
-				if(xhr.status == 200)
-				{
-					alert("No results found");
-				}else
-				
-				alert("Search failed. Response status: "+xhr.status);
 			}
-			
 		});
 		
 		}

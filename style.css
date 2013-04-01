@@ -457,6 +457,10 @@ td
 	font-size:2px;
 }
 
+.ui-dialog-titlebar{
+	display:none;	
+}
+
 .selectedcourses .sectionRow
 {
 	opacity: 100 !important;
@@ -480,9 +484,33 @@ td
 	height:92%;
 }
 
-#filters
+#filters li
 {
-	display:none;
+	list-style:none;
+}
+#filterList{
+	clear:both;
+	margin-left:20px;
+	margin-right:20px;
+}
+
+.filterRow{
+	float:left;	
+	font-size:10px;
+	margin-left:5px;
+	margin-right:5px;
+}
+#filterFooter{
+	clear:both;	
+}
+#clearFilters
+{
+	margin-top:10px;
+	float:right;	
+	margin-right:20px;
+	line-height:1.0;
+	font-size:9px;
+	cursor:pointer;
 }
 
   .ui-autocomplete-category {
@@ -499,6 +527,7 @@ td
 	max-height: 400px;
 	overflow:hidden;  
   }
+  
   
 .nano .content { padding: 10px; }
 .nano .pane   { background: #888; }
