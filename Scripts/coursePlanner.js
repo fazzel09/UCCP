@@ -4,18 +4,24 @@ $(document).ready(function(){
 	$('.ui-autocomplete').nanoScroller();
 	
 	/* ----- Data types used for local course information ----- */
-	function Course(value)
-	{	
-		this.courseCredits = 0;
-		this.courseName = value['CourseName'];
-		this.courseNum = value['courseNum'];	
-		this.callNum = value['callNum'];
-		this.section = value['sectNum'];
-		this.days = value['days'];
-		this.startTime = new Time( value['start_time']);
-		this.endTime = new Time( value['end_time']);
+	function Course(name,num,callNum,section,days,startTime,endTime,creditHours, description, isUnderGrad, isGrad, instructor, startDate, endDate)
+	{
+		this.courseName = name.split(' ').join('');
+		this.courseNum = num.split(' ').join('');	
+		this.callNum = callNum.split(' ').join('');
+		this.section = section.split(' ').join('');
+		this.days = days.split(' ').join('');
+		this.startTime = new Time( startTime.split(' ').join(''));
+		this.endTime = new Time( endTime.split(' ').join('') );
 		this.duration = new Duration(this.startTime, this.endTime);
 		this.color = getRandomColor();
+		this.creditHours = creditHours.split(' ').join('');
+		this.description = description.split(' ').join('');
+		this.startDate = startDate.split(' ').join('');
+		this.endDate = endDate.split(' ').join('');
+		this.isUnderGrad = isUnderGrad.split(' ').join('');
+		this.isGrad = isGrad.split(' ').join('');
+		this.instructor = instructor.split(' ').join('');
 		
 		// These are the rows in the search results list.
 		this.courseRow = '<div class="courseRow '+this.courseNum+'"><div class="courseInfo">'+this.courseNum+':'+this.courseName+'</div><img class="showSections '
@@ -88,80 +94,77 @@ $(document).ready(function(){
 		this.sectionBlocks = new Array();
 	}
 	
+	function jsonCallback(data)
+	{
+		console.log("Callback");	
+	}
+	function buildRequest()
+	{
+		var request = "https://webservices-webdev2.uc.edu/CoursePlanner/CoursePlannerService.svc/GetCoursePlanner?termID='2013B03'"	
+		for(var i=0; i<filterArray.length; i++)
+		{
+			var filter = filterArray[i];
+			if(filter[0] == 'timeSlot')
+			{
+				var startTime = filter[1].split('-')[0];
+				var endTime = filter[1].split('-')[1];
+				request+="&meetingStartTime='"+startTime+"'";
+				request+="&meetingStopTime='"+endTime+"'";
+			}
+			else
+			{
+				request+="&"+searchKeys[filter[0]]+"='"+filter[1]+"'";	
+			}
+		}
+		
+		return request;
+	}
 	/* ----- search Functions -----*/
 	function search()
 	{
-		if($('#searchBox').val()=="")
-		{
-			alert("Don't leave the search results blank, you'll eff my shit up brah. (Enter a space if you really wanna see everything.)");	
-			return;
-		}
 		$('.selectionBox').css('opacity','.5');
-		if(!searchStartTime)
-		{
-			searchStartTime='0700';
-			searchEndTime='2200';
-		}
-
-		//Add a '00' onto the end of times with only the hours: 10 becomes 1000
-		if(searchStartTime.length<3)
-		{
-			searchStartTime+=00;	
-		}
-		
-		if(searchStartTime>searchEndTime)
-		{
-			var temp = searchStartTime;
-			searchStartTime = searchEndTime;
-			searchEndTime = temp;	
-		}
 			
-		searchStartTime = searchStartTime.substring(0, 2) + ':' + searchStartTime.substring(2, searchStartTime.length);
+		var request = new XMLHttpRequest();
 		
-		
-		if(searchEndTime.length<3)
-		{
-			searchEndTime+=':00';
-		}
-		else
-		{
-			searchEndTime = searchEndTime.substring(0, 2) + ':' + searchEndTime.substring(2, searchEndTime.length)
-		}
-		
-		console.log('start: '+searchStartTime+', end: '+searchEndTime);
-		$.ajax({
-			type:'POST',
-			url:'Scripts/database.php',
-			dataType:'json',
-			data:{
-				search:$('#searchBox').val(),
-				days:searchDays,
-				startTime:searchStartTime,
-				endTime:searchEndTime,
-				discipline:searchDiscipline,
-				college:searchCollege,
-				bok:searchBOK
-			},
-			success:function(data){
-				console.log("Success");
-				generateArrays(data);
-				addFilter({
-					category:null, 
-					disp:$('#searchBox').val(), 
-					key:$('#searchBox').val()
-					});
-				$('#searchBox').val("");
-				updateResultsList(data);
-			},
-			error:function(xhr, ajaxOptions, thrownError){
-				if(xhr.status == 200)
+		request.onreadystatechange = function() {
+			if (request.readyState == 4) 
+			{
+				searchResults = new Array();
+				parser=new DOMParser();
+ 			 	var xmlDoc=parser.parseFromString(request.responseText,"text/xml");
+				console.log(xmlDoc);
+
+				$(xmlDoc).find('element').each(function()
 				{
-					alert("No results found");
-				}else
+					var course = new Course(
+						$(this).find('AbbreviatedTitle').text(),
+						$(this).find('CourseNumber').text(),
+						$(this).find('CallNumber').text(),
+						$(this).find('SectionNumber').text(),
+						$(this).find('DaysOfTheWeek').text(),
+						$(this).find('MeetingStartTime').text(),
+						$(this).find('MeetingStopTime').text(),
+						$(this).find('CreditHourMinimum').text(),
+						$(this).find('Descript').text(),
+						$(this).find('IsUndergraduate').text(),
+						$(this).find('IsGraduate').text(),
+						$(this).find('InstructorName').text(),
+						$(this).find('BeginDate').text(),
+						$(this).find('EndDate').text()
+					);
+					
+					if($(this).find('MeetingStartTime').text() != '')
+						searchResults.push(course);
+				});
 				
-				alert("Search failed. Response status: "+xhr.status);
+				updateResultsList();
 			}
-		});
+		}
+		var URL = buildRequest();
+		console.log(URL);
+		request.open("GET",URL, true);
+		request.send();
+		
 		resetSearchItems();		
 	}
 	$('#filters').hide();
@@ -184,11 +187,13 @@ $(document).ready(function(){
 		var key = item.key;
 		var label = item.label;
 		var cat = item.category;
+		if(cat == "timeSlot");
+			key = item.disp;
 		var filterRow = '<div class="filterRow '+key+'">'+item.disp+'<div class="deleteFilter">x</div></div>';
 
 		$('#filterList').append(filterRow);
 		
-		filter.push(item.category, item.key);
+		filter.push(item.category, key);
 		filterArray.push(filter);
 
 		$('#filters').show();
@@ -1064,6 +1069,8 @@ $(document).ready(function(){
   });
 	
 		var autocompleteCategories = ["Attributes", "Campuses", "Colleges", "Disciplines", "Formats", "General Education"];
+		
+		var searchKeys = ["attributeCode","campusCode","collegeCode","disciplineCode","formatCode","genedCode"];
 	$('#searchBox').catcomplete({
 		minLength:2,
 		select: function(event, ui)
