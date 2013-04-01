@@ -6,22 +6,22 @@ $(document).ready(function(){
 	/* ----- Data types used for local course information ----- */
 	function Course(name,num,callNum,section,days,startTime,endTime,creditHours, description, isUnderGrad, isGrad, instructor, startDate, endDate)
 	{
-		this.courseName = name;
-		this.courseNum = num;	
-		this.callNum = callNum;
-		this.section = section;
-		this.days = days;
-		this.startTime = new Time( startTime);
-		this.endTime = new Time( endTime );
+		this.courseName = name.split(' ').join('');
+		this.courseNum = num.split(' ').join('');	
+		this.callNum = callNum.split(' ').join('');
+		this.section = section.split(' ').join('');
+		this.days = days.split(' ').join('');
+		this.startTime = new Time( startTime.split(' ').join(''));
+		this.endTime = new Time( endTime.split(' ').join('') );
 		this.duration = new Duration(this.startTime, this.endTime);
 		this.color = getRandomColor();
-		this.creditHours = creditHours;
-		this.description = description;
-		this.startDate = startDate;
-		this.endDate = endDate;
-		this.isUnderGrad = isUnderGrad;
-		this.isGrad = isGrad;
-		this.instructor = instructor;
+		this.creditHours = creditHours.split(' ').join('');
+		this.description = description.split(' ').join('');
+		this.startDate = startDate.split(' ').join('');
+		this.endDate = endDate.split(' ').join('');
+		this.isUnderGrad = isUnderGrad.split(' ').join('');
+		this.isGrad = isGrad.split(' ').join('');
+		this.instructor = instructor.split(' ').join('');
 		
 		// These are the rows in the search results list.
 		this.courseRow = '<div class="courseRow '+this.courseNum+'"><div class="courseInfo">'+this.courseNum+':'+this.courseName+'</div><img class="showSections '
@@ -99,8 +99,17 @@ $(document).ready(function(){
 		for(var i=0; i<filterArray.length; i++)
 		{
 			var filter = filterArray[i];
-			
-			request+="&"+searchKeys[filter[0]]+"='"+filter[1]+"'";	
+			if(filter[0] == 'timeSlot')
+			{
+				var startTime = filter[1].split('-')[0];
+				var endTime = filter[1].split('-')[1];
+				request+="&meetingStartTime='"+startTime+"'";
+				request+="&meetingStopTime='"+endTime+"'";
+			}
+			else
+			{
+				request+="&"+searchKeys[filter[0]]+"='"+filter[1]+"'";	
+			}
 		}
 		
 		return request;
@@ -108,42 +117,7 @@ $(document).ready(function(){
 	/* ----- search Functions -----*/
 	function search()
 	{
-		if($('#searchBox').val()=="")
-		{
-			alert("Don't leave the search results blank, you'll eff my shit up brah. (Enter a space if you really wanna see everything.)");	
-			return;
-		}
 		$('.selectionBox').css('opacity','.5');
-		if(!searchStartTime)
-		{
-			searchStartTime='0700';
-			searchEndTime='2200';
-		}
-
-		//Add a '00' onto the end of times with only the hours: 10 becomes 1000
-		if(searchStartTime.length<3)
-		{
-			searchStartTime+=00;	
-		}
-		
-		if(searchStartTime>searchEndTime)
-		{
-			var temp = searchStartTime;
-			searchStartTime = searchEndTime;
-			searchEndTime = temp;	
-		}
-			
-		searchStartTime = searchStartTime.substring(0, 2) + ':' + searchStartTime.substring(2, searchStartTime.length);
-		
-		
-		if(searchEndTime.length<3)
-		{
-			searchEndTime+=':00';
-		}
-		else
-		{
-			searchEndTime = searchEndTime.substring(0, 2) + ':' + searchEndTime.substring(2, searchEndTime.length)
-		}
 			
 		var request = new XMLHttpRequest();
 		
@@ -174,7 +148,8 @@ $(document).ready(function(){
 						$(this).find('EndDate').text()
 					);
 					
-					searchResults.push(course);
+					if($(this).find('MeetingStartTime').text() != '')
+						searchResults.push(course);
 				});
 				
 				updateResultsList();
@@ -207,11 +182,13 @@ $(document).ready(function(){
 		var key = item.key;
 		var label = item.label;
 		var cat = item.category;
+		if(cat == "timeSlot");
+			key = item.disp;
 		var filterRow = '<div class="filterRow '+key+'">'+item.disp+'<div class="deleteFilter">x</div></div>';
 
 		$('#filterList').append(filterRow);
 		
-		filter.push(item.category, item.key);
+		filter.push(item.category, key);
 		filterArray.push(filter);
 
 		$('#filters').show();
