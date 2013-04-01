@@ -93,6 +93,7 @@ $DB -> connect();
 			
 			
 			</div>
+			<div id="hoverOnCalendar"></div>
 			
         </div>
         <div class="selectedcourses">

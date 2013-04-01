@@ -26,15 +26,19 @@ $(document).ready(function(){
 		
 		//The detailed information that goes into the popover when you mouse over a section on the calendar.	
 		this.detailedSectionInfo = '<table>'
-			+'<tr><td>Course Name</td><td>'+this.courseName+'</td></tr>'
-			+'<tr><td>Course Number</td><td>'+this.courseNum+'</td></tr>'
-			+'<tr><td>Call Number</td><td>'+this.callNum+'</td></tr>'
-			+'<tr><td>Days</td><td>'+this.days+'</td></tr>'
-			+'<tr><td>Times</td><td>'+this.startTime.string+'-'+this.endTime.string+'</td></tr>'
+			+'<tr><td>Name:</td><td>'+this.courseName+'</td></tr>'
+			+'<tr><td>Number:</td><td>'+this.courseNum+'</td></tr>'
+			+'<tr><td>Call Number:</td><td>'+this.callNum+'</td></tr>'
+			+'<tr><td>Days:</td><td>'+this.days+'</td></tr>'
+			+'<tr><td>Times:</td><td>'+this.startTime.string+'-'+this.endTime.string+'</td></tr>'
 			+'</table>';
 			
+		//this.
+			
 		// This is the blocks displayed over the calendar
-		this.sectionBlock = '<div class="deleteSection '+this.callNum+'">X</div><div class="courseNum">'+this.courseNum+'</div>';
+		this.sectionBlock = '<div class="deleteSection '+this.callNum+'">X</div><div class="courseNum">'
+				+this.courseNum+'<br />'+this.courseName+'<br />'+this.callNum+'<br />'+this.days+' '
+				+this.startTime.string+'-'+this.endTime.string+'</div>';
 	}
 	
 	function Time(value)
@@ -457,23 +461,46 @@ $(document).ready(function(){
 		$('.sectionBlock').hover(function(e)
 		{
 			console.log('Hover: '+$(this).attr('class'));
-			console.log('Height: '+$(this).height());
+			//console.log('Height: '+$(this).height());
 			
 			var course = findCourse($(this).attr('class').split(' ')[1]);
-			
-			$('#sectInfoDialog').dialog( "option", "title", course.courseName);
-			$('#sectInfoDialog').html(course.detailedSectionInfo);
-			$('#sectInfoDialog').dialog( "option", "position", [e.pageX+20,$(this).offset().top +$(this).height() - $(window).scrollTop()+20] );
-			$('#sectInfoDialog').dialog('open');
-			$('#sectInfoDialog').show();
-			$('.ui-dialog').show();
+			if($(this).height() < 100)
+				$(this).css("height", "100");
+
+			//$("."+this.callNum).css("height","200px");
+			//$('#hoverOnCalendar').html(course.detailedSectionInfo);
+			//$('#hoverOnCalendar').css({'top':e.pageX,'left':e.pageY});
+			//$('#hoverOnCalendar').css('display', 'block');
+			//$('#sectInfoDialog').dialog( "option", "title", course.courseName);
+			//$('#sectInfoDialog').html(course.detailedSectionInfo);
+			//$('#sectInfoDialog').dialog( "option", "position", [e.pageX+20,$(this).offset().top +$(this).height() - $(window).scrollTop()+20] );
+			//$('#sectInfoDialog').dialog('open');
+			//$('#sectInfoDialog').show();
+			//$('.ui-dialog').show();
 		},
 		function(e)
 		{
 			console.log('HoverOut');
+			
+			if($(this).height() <= 100){
+				var course = findCourse($(this).attr('class').split(' ')[1]);
+				
+				var hours = Math.floor(course.endTime.numeric/100)-Math.floor(course.startTime.numeric/100);
+				var mins = (course.endTime.numeric%100) - (course.startTime.numeric%100);
+				if(mins < 0)
+				{
+					mins += 60;
+					hours --;
+				}
+				var durationDecimal = hours + (mins/60);
+				var height = (durationDecimal*hourHeight);
+				console.log("height: "+height+" start time: "+course.startTime.string+" end time: "+course.endTime.string+" hourHeight: "+hourHeight);
+				$(this).css("height", height);
+			}
+			//$('#hoverOnCalendar').css('display', 'none');
 			//$('#sectInfoDialog').dialog('close');
 			//$('#sectInfoDialog').dialog('close');
-			$('.ui-dialog').hide();
+			//$('.ui-dialog').hide();
 		});
 	};
 	
@@ -927,6 +954,7 @@ $(document).ready(function(){
 		});
 		
 		//Add a listener on the section block on the calendar to overlay detailed section info.
+		/*
 		$('.sectionBlock').hover(function(e)
 		{
 			var course = findCourse($(this).attr('class').split(' ')[1]);
@@ -941,6 +969,7 @@ $(document).ready(function(){
 		{
 			$('#sectInfoDialog').dialog('close');
 		});
+		*/
 	}
 					
 	function getRandomColor() {
@@ -969,7 +998,6 @@ $(document).ready(function(){
 	
 	$("#closeExport").click(function() {
 		$("#exportInfo").css('display', 'none');
-	
 	});
 	
 	$(window).resize(function(e)
