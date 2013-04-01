@@ -81,6 +81,19 @@ $DB -> connect();
                 <button id="showSelectedCourses" value="showSelectedCourses">Show Courses</button>
                 <button id="export" value="export">Export</button>
             </div>
+			
+			<div class="exportDiv" id="exportInfo">
+				<div id="closeExport">x</div>
+				Your selected course information:
+				<br /><br />
+				<table id="exportTable">
+					
+				
+				</table>
+			
+			
+			</div>
+			
         </div>
         <div class="selectedcourses">
             <h3>Selected Courses</h3>

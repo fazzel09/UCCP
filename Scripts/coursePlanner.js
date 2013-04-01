@@ -5,7 +5,8 @@ $(document).ready(function(){
 	
 	/* ----- Data types used for local course information ----- */
 	function Course(value)
-	{
+	{	
+		this.courseCredits = 0;
 		this.courseName = value['CourseName'];
 		this.courseNum = value['courseNum'];	
 		this.callNum = value['callNum'];
@@ -25,6 +26,7 @@ $(document).ready(function(){
 		
 		//The detailed information that goes into the popover when you mouse over a section on the calendar.	
 		this.detailedSectionInfo = '<table>'
+			+'<tr><td>Course Name</td><td>'+this.courseName+'</td></tr>'
 			+'<tr><td>Course Number</td><td>'+this.courseNum+'</td></tr>'
 			+'<tr><td>Call Number</td><td>'+this.callNum+'</td></tr>'
 			+'<tr><td>Days</td><td>'+this.days+'</td></tr>'
@@ -360,7 +362,7 @@ $(document).ready(function(){
 		{
 			if(selectedCourses[i].callNum == callNum)
 			{
-				console.log('course found');
+				console.log('course found1');
 				return selectedCourses[i];
 			}
 		}
@@ -368,7 +370,7 @@ $(document).ready(function(){
 		{
 			if(searchResults[i].callNum == callNum)
 			{
-				console.log('course found');
+				console.log('course found2');
 				return searchResults[i];
 			}
 		}
@@ -463,7 +465,7 @@ $(document).ready(function(){
 			$('#sectInfoDialog').html(course.detailedSectionInfo);
 			$('#sectInfoDialog').dialog( "option", "position", [e.pageX+20,$(this).offset().top +$(this).height() - $(window).scrollTop()+20] );
 			$('#sectInfoDialog').dialog('open');
-			//$('#sectInfoDialog').show();
+			$('#sectInfoDialog').show();
 			$('.ui-dialog').show();
 		},
 		function(e)
@@ -951,6 +953,25 @@ $(document).ready(function(){
 		return color;
 	}
 	
+	$("#export").click(function() {
+		
+		$('#exportTable').html('<tr><th>Course Name</th><th>Call Number</th><th>Credits</th><th>G/UG</th></tr>');
+		for(var i=0; i<selectedCourses.length; i++)
+		{
+			$('#exportTable tr:last').after('<tr><td>'+selectedCourses[i].courseName+'</td>'
+					+'<td>'+selectedCourses[i].callNum+'</td>'
+					+'<td>'+selectedCourses[i].courseCredits+'</td>'
+					+'<td>U</td>');
+		}
+		
+		$("#exportInfo").css('display', 'block');
+	});
+	
+	$("#closeExport").click(function() {
+		$("#exportInfo").css('display', 'none');
+	
+	});
+	
 	$(window).resize(function(e)
 	{
 		console.log('Resize');
@@ -1099,3 +1120,4 @@ $(document).ready(function(){
 	
 	resetSelectionListeners();
 });
+
