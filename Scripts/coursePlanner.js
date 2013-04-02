@@ -95,7 +95,9 @@ $(document).ready(function () {
             var filter = filterArray[i];
             if (filter[0] == 'timeSlot') {
                 var startTime = filter[1].split('-')[0];
+				startTime = [startTime.slice(0, 2),':', startTime.slice(2)].join('');
                 var endTime = filter[1].split('-')[1];
+				endTime= [endTime.slice(0, 2),':', endTime.slice(2)].join('')
                 request += "&meetingStartTime='" + startTime + "'";
                 request += "&meetingStopTime='" + endTime + "'";
             }
@@ -169,10 +171,9 @@ $(document).ready(function () {
         var key = item.key;
         var label = item.label;
         var cat = item.category;
-        if (cat == "timeSlot");
-        key = item.disp;
-        var filterRow = '<div class="filterRow ' + key + '">' + item.disp + '<div class="deleteFilter">x</div></div>';
 
+        var filterRow = '<div class="filterRow ' + key + '">' + item.disp + '<div class="deleteFilter">x</div></div>';
+		
         $('#filterList').append(filterRow);
 
         filter.push(item.category, key);
