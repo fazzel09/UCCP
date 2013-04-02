@@ -968,7 +968,7 @@ $(document).ready(function(){
 			$('.selectionBox.M').css('left',$('.M').offset().left - $('#calendar').offset().left);
 			$('.selectionBox.T').css('left',$('.T').offset().left - $('#calendar').offset().left);
 			$('.selectionBox.W').css('left',$('.W').offset().left - $('#calendar').offset().left);
-			$('.selectionBox.R').css('left',$('.H').offset().left - $('#calendar').offset().left);
+			$('.selectionBox.R').css('left',$('.R').offset().left - $('#calendar').offset().left);
 			$('.selectionBox.F').css('left',$('.F').offset().left - $('#calendar').offset().left);
 			$('.selectionBox.S').css('left',$('.S').offset().left - $('#calendar').offset().left);
 			$('.selectionBox.U').css('left',$('.U').offset().left - $('#calendar').offset().left);
@@ -1022,7 +1022,7 @@ $(document).ready(function(){
 	
 		var autocompleteCategories = ["Attributes", "Campuses", "Colleges", "Disciplines", "Formats", "General Education"];
 		
-		var searchKeys = ["attributeCode","campusCode","collegeCode","disciplineCode","formatCode","genedCode"];
+		var searchKeys = ["Attribute","schedulingAreaCode","offeringCollegeCodes","disciplineCode","classFormat","genEdCode"];
 	$('#searchBox').catcomplete({
 		minLength:2,
 		select: function(event, ui)
