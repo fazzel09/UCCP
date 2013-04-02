@@ -78,7 +78,6 @@ $DB -> connect();
         <?php require "calendar.php"; ?>
     
             <div class="scheduleButtons">
-                <button id="showSelectedCourses" value="showSelectedCourses">Show Courses</button>
                 <button id="export" value="export">Export</button>
             </div>
 			

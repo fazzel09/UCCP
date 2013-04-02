@@ -6,7 +6,7 @@ body
 {
 	background-color:#4D4D4D;
 	text-align:center;
-	font-family:"Comic Sans MS";
+	font-family:"Arial";
 	font-size:12px;
 	min-width:930px;
 }
@@ -31,6 +31,10 @@ body
 	top:0px;
 	left:0px;
 	display:none;
+	width:400px;
+	padding:20px;
+	border-radius: 15px;
+	border:1px solid black;
 }
 
 #exportInfo
@@ -277,7 +281,7 @@ th, td #exportTable
 	box-shadow: 3px 3px 4px #000;
 	overflow:hidden;
 	padding:5px;
-	text-align:center;
+	text-align:left;
 	white-space:nowrap;
 	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
 	-moz-box-sizing: border-box;    /* Firefox, other Gecko */
@@ -550,6 +554,11 @@ td
 	font-size:10px;
 	margin-left:5px;
 	margin-right:5px;
+	background-color:#4D4D4D;
+	padding:0px 4px 0px 4px;
+	border-radius: 5px 5px 5px 5px;
+	color:White;
+}
 }
 #filterFooter{
 	clear:both;	
