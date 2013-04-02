@@ -5,29 +5,30 @@ $(document).ready(function () {
 
     /* ----- Data types used for local course information ----- */
     function Course(name, num, callNum, section, days, startTime, endTime, creditHours, description, isUnderGrad, isGrad, instructor, startDate, endDate) {
-        this.courseName = name.split(' ').join('');
-        this.courseNum = num.split(' ').join('');
-        this.callNum = callNum.split(' ').join('');
-        this.section = section.split(' ').join('');
-        this.days = days.split(' ').join('');
-        this.startTime = new Time(startTime.split(' ').join(''));
-        this.endTime = new Time(endTime.split(' ').join(''));
-        this.duration = new Duration(this.startTime, this.endTime);
-        this.color = getRandomColor();
-        this.creditHours = creditHours.split(' ').join('');
-        this.description = description.split(' ').join('');
-        this.startDate = startDate.split(' ').join('');
-        this.endDate = endDate.split(' ').join('');
-        this.isUnderGrad = isUnderGrad.split(' ').join('');
-        this.isGrad = isGrad.split(' ').join('');
-        this.instructor = instructor.split(' ').join('');
+		this.courseName = name.trim();
+		this.courseNum = num.trim();	
+		this.callNum = callNum.trim();
+		this.section = section.trim();
+		this.days = days.trim();
+		this.startTime = new Time( startTime.trim());
+		this.endTime = new Time( endTime.trim());
+		this.duration = new Duration(this.startTime, this.endTime);
+		this.color = getRandomColor();
+		this.creditHours = creditHours.trim();
+		this.description = description.trim();
+		this.startDate = startDate.trim();
+		this.endDate = endDate.trim();
+		this.isUnderGrad = isUnderGrad.trim();
+		this.isGrad = isGrad.trim();
+		this.instructor = instructor.trim();
 
         // These are the rows in the search results list.
         this.courseRow = '<div class="courseRow ' + this.courseNum + '"><div class="courseInfo">' + this.courseNum + ':' + this.courseName + '</div><img class="showSections '
 			+ this.courseNum + '" id="showSections" ><div class="sectionData ' + this.courseNum + '"></div></div>';
         this.sectionRow = '<div class="sectionRow ' + this.callNum + '" ><div class="deleteSection '
 			+ this.callNum + '">X</div><div class="courseNum">' + this.courseNum + '</div><div class="sectionInfo">' + this.days + ':' + this.startTime.string + '-'
-			+ this.endTime.string + ' Instructor here</div><img class="sectionAddButton ' + this.callNum + '"></div>';
+			+ this.endTime.string + ' '+this.instructor+'</div><img class="sectionAddButton ' + this.callNum + '"></div>';
+
 
         //The detailed information that goes into the popover when you mouse over a section on the calendar.	
         this.detailedSectionInfo = '<table>'
@@ -1107,9 +1108,9 @@ $(document).ready(function () {
 		
   });
 	
-		var autocompleteCategories = ["Attributes", "Campuses", "Colleges", "Disciplines", "Formats", "General Education"];
+		var autocompleteCategories = ["Attributes", "Campuses", "Colleges", "Disciplines", "Formats", "General Education", "Courses"];
 		
-		var searchKeys = ["Attribute","schedulingAreaCode","offeringCollegeCodes","disciplineCode","classFormat","genEdCode"];
+		var searchKeys = ["Attribute","schedulingAreaCode","offeringCollegeCodes","disciplineCode","classFormat","genEdCode","courseNum"];
 	$('#searchBox').catcomplete({
 		minLength:2,
 		select: function(event, ui)
