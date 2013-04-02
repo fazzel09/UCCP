@@ -945,87 +945,253 @@ $(document).ready(function () {
 	    }
 
 	});
-
-    var autocompleteCategories = ["Attributes", "Campuses", "Colleges", "Disciplines", "Formats", "General Education"];
-
-    var searchKeys = ["attributeCode", "campusCode", "collegeCode", "disciplineCode", "formatCode", "genedCode"];
-    $('#searchBox').catcomplete({
-        minLength: 2,
-        select: function (event, ui) {
-            addFilter(ui.item);
-            event.preventDefault();
-        },
-
-        source: function (request, response) {
-            console.log("Term:" + request.term);
-            $.ajax({
-                type: 'POST',
-                url: 'Scripts/database.php',
-                dataType: 'json',
-                data: {
-                    autoComplete: request.term
-                },
-                success: function (data) {
-                    response($.map(data, function (item) {
-                        return {
-                            label: item[1],
-                            category: parseInt(item[0]) - 1,
-                            key: item[2],
-                            disp: item[3]
-                        }
-                    }));
-                }
-            });
-
-        }
-    });
-
-    $('#mandatorySearch').click(function () {
-        search();
-    });
-
-    function resetSearchItems() {
-        searchStartTime = '0700';
-        searchEndTime = '2200';
-        searchDays = 'MTWRFSU';
-        searchDiscipline = '';
-        searchCollege = '';
-        searchBOK = ''
-    }
-
-    var searchStartTime;
-    var searchEndTime;
-    var searchDays;
-    var searchDiscipline;
-    var searchCollege;
-    var searchBOK;
-
-    var searchResults = new Array();
-    var selectedCourses = new Array();
-    var hourHeight = $('.08').position().top - $('.07').position().top
-    var dayWidth = $('.T').position().left - $('.M').position().left - 3;
-
-    var monday = new Day();
-    var tuesday = new Day();
-    var wednesday = new Day();
-    var thursday = new Day();
-    var friday = new Day();
-    var saturday = new Day();
-    var sunday = new Day();
-
-    /*	for(var i=0;i<181;i++)
-    {
-    monday[i]=new CalendarBlock(null);
-    tuesday[i]=new CalendarBlock(null);
-    wednesday[i]=new CalendarBlock(null);
-    thursday[i]=new CalendarBlock(null);
-    friday[i]=new CalendarBlock(null);
-    saturday[i]=new CalendarBlock(null);
-    sunday[i]=new CalendarBlock(null);
-    }*/
-    var filters = new Array()
-
-
-    resetSelectionListeners();
+	
+	//Reset the listeners that display the selection box over the calendar. This must be done after a selection, to be ready for the next selection.
+	function resetSelectionListeners()
+	{		
+		$('#calendar td').mousedown(function(e)
+		{	
+			searchStartTime = e.target.className.split(' ')[0];
+			searchDay = e.target.className.split(' ')[1];
+			
+			var top = $(this).offset().top - $('#calendar').offset().top;
+			var left = $(this).offset().left - $('#calendar').offset().left;
+			$('.selectionBox').remove();
+			
+			$('#calendar').append('<div class="selectionBox '+searchDay+'"></div>');
+			$('.selectionBox').css({'top': top, 'left': left, 'width': dayWidth, 'height': '0'});
+	
+			$('#calendar .'+searchDay+', .selectionBox').mousemove(function(e)
+			{
+				//console.log('target: ' + e.target.className);
+				var height = e.pageY - $('#calendar').offset().top - top;
+				if(height<0)
+				{
+					$('.selectionBox').css('top', top+height+2);
+					height = Math.abs(height) - 2;	
+				}
+				else
+				{
+					$('.selectionBox').css('top', top);	
+				}
+				$('.selectionBox').css('height', height)
+			});
+			
+			$('#calendar td').mouseup(function(e)
+			{
+				searchEndTime = e.target.className.split(' ')[0];
+				$('.selectionBox, #calendar td, #calendar, #calendar .'+searchDay+', .sectionBlock').unbind();
+				console.log('mouseup '+e.target.className+' Start/end time: '+searchStartTime+'/'+searchEndTime);
+				resetSelectionListeners();
+				if(searchStartTime != searchEndTime)
+				{
+					addTimeSlotFilter();
+				}
+			});
+			
+			$('.sectionBlock').mouseover(function(e)
+			{
+				$('.selectionBox, #calendar td, #calendar, #calendar .'+searchDay+', .sectionBlock').unbind();
+				console.log('mouseup '+e.target.className);
+				resetSelectionListeners();
+			});
+		});
+		
+		//Add a listener on the section block on the calendar to overlay detailed section info.
+		/*
+		$('.sectionBlock').hover(function(e)
+		{
+			var course = findCourse($(this).attr('class').split(' ')[1]);
+			
+			$('#sectInfoDialog').dialog( "option", "title", course.courseName);
+			$('#sectInfoDialog').html(course.detailedSectionInfo);
+			$('#sectInfoDialog').dialog( "option", "position", [$(this).offset().left+20,$(this).offset().top +$(this).height() - $(window).scrollTop()+20] );
+			$('#sectInfoDialog').dialog('open');
+			
+		},
+		function(e)
+		{
+			$('#sectInfoDialog').dialog('close');
+		});
+		*/
+	}
+					
+	function getRandomColor() {
+		var letters = '0123456789ABCDEF'.split('');
+		var color = '';
+		for (var i = 0; i < 3; i++ ) {
+			color += Math.round(Math.random() * 155 + 100)+', ';
+		}
+		color += '1'
+		return color;
+	}
+	
+	$("#export").click(function() {
+		
+		$('#exportTable').html('<tr><th>Course Name</th><th>Call Number</th><th>Credits</th><th>G/UG</th></tr>');
+		for(var i=0; i<selectedCourses.length; i++)
+		{
+			$('#exportTable tr:last').after('<tr><td>'+selectedCourses[i].courseName+'</td>'
+					+'<td>'+selectedCourses[i].callNum+'</td>'
+					+'<td>'+selectedCourses[i].courseCredits+'</td>'
+					+'<td>U</td>');
+		}
+		
+		$("#exportInfo").css('display', 'block');
+	});
+	
+	$("#closeExport").click(function() {
+		$("#exportInfo").css('display', 'none');
+	});
+	
+	$(window).resize(function(e)
+	{
+		console.log('Resize');
+		dayWidth = $('.T').position().left - $('.M').position().left;
+		
+		if($('.selectionBox').length)
+		{
+			$('.selectionBox').css('width',dayWidth);
+			$('.selectionBox.M').css('left',$('.M').offset().left - $('#calendar').offset().left);
+			$('.selectionBox.T').css('left',$('.T').offset().left - $('#calendar').offset().left);
+			$('.selectionBox.W').css('left',$('.W').offset().left - $('#calendar').offset().left);
+			$('.selectionBox.R').css('left',$('.R').offset().left - $('#calendar').offset().left);
+			$('.selectionBox.F').css('left',$('.F').offset().left - $('#calendar').offset().left);
+			$('.selectionBox.S').css('left',$('.S').offset().left - $('#calendar').offset().left);
+			$('.selectionBox.U').css('left',$('.U').offset().left - $('#calendar').offset().left);
+		}
+		
+		checkConflicts(monday, null, 'M' );
+		checkConflicts(tuesday, null, 'T' );
+		checkConflicts(wednesday, null, 'W' );
+		checkConflicts(thursday, null, 'R' );
+		checkConflicts(friday, null, 'F' );
+		checkConflicts(saturday, null, 'S' );
+		checkConflicts(sunday, null, 'U' );
+		
+	});
+			
+	$('#searchDialog').dialog({
+		autoOpen:false,
+		modal:true,
+		height:150,
+		resizable:false,
+		buttons:{ "Search":function(){console.log('Search');}, "Cancel":			function(){$(this).dialog("close");}},
+		close:function(){$('.selectionBox').remove();}
+	});
+	
+	$('#sectInfoDialog').dialog({
+		autoOpen:false,
+		modal:false,
+		height:150,
+		width:230,
+		resizable:false
+	});
+	
+	$.widget( "custom.catcomplete", $.ui.autocomplete, 
+	{
+		_renderMenu: function( ul, items ) 
+		{
+			var that = this, currentCategory = "";
+			$.each( items, function( index, item ) 
+			{
+				var itemCategory = autocompleteCategories[item.category];
+				if ( itemCategory != currentCategory ) 
+				{
+					ul.append( "<li class='ui-autocomplete-category'>" + itemCategory + "</li>" );
+					currentCategory = itemCategory;
+				}
+				that._renderItemData( ul, item );
+			});
+		}
+		
+  });
+	
+		var autocompleteCategories = ["Attributes", "Campuses", "Colleges", "Disciplines", "Formats", "General Education"];
+		
+		var searchKeys = ["Attribute","schedulingAreaCode","offeringCollegeCodes","disciplineCode","classFormat","genEdCode"];
+	$('#searchBox').catcomplete({
+		minLength:2,
+		select: function(event, ui)
+		{
+			addFilter(ui.item);
+			event.preventDefault();
+		},
+		
+		source: function( request, response)
+		{
+			console.log("Term:" + request.term);
+			$.ajax({
+			type:'POST',
+			url:'Scripts/database.php',
+			dataType:'json',
+			data:{
+				autoComplete:request.term
+			},
+			success:function( data ) 
+			{
+				response( $.map( data, function( item ) 
+				{
+					return {
+					label: item[1],
+					category: parseInt(item[0])-1,
+					key: item[2],
+					disp: item[3]
+				  	}
+				}));
+			}
+		});
+		
+		}
+	});
+	
+	$('#mandatorySearch').click(function(){
+		search();
+	});
+	
+	function resetSearchItems()
+	{
+		searchStartTime = '0700';
+		searchEndTime = '2200';
+		searchDays = 'MTWRFSU';
+		searchDiscipline = '';
+		searchCollege= '';
+		searchBOK = ''
+	}
+	
+	var searchStartTime;
+	var searchEndTime;
+	var searchDays;
+	var searchDiscipline;
+	var searchCollege;
+	var searchBOK;
+		
+	var searchResults = new Array();
+	var selectedCourses = new Array();
+	var hourHeight = $('.08').position().top - $('.07').position().top
+	var dayWidth = $('.T').position().left - $('.M').position().left-3;
+	
+	var monday = new Day();
+	var tuesday = new Day();
+	var wednesday = new Day();
+	var thursday = new Day();
+	var friday = new Day();
+	var saturday = new Day();
+	var sunday = new Day();
+	
+/*	for(var i=0;i<181;i++)
+	{
+		monday[i]=new CalendarBlock(null);
+		tuesday[i]=new CalendarBlock(null);
+		wednesday[i]=new CalendarBlock(null);
+		thursday[i]=new CalendarBlock(null);
+		friday[i]=new CalendarBlock(null);
+		saturday[i]=new CalendarBlock(null);
+		sunday[i]=new CalendarBlock(null);
+	}*/
+	var filters = new Array()
+	
+	
+	resetSelectionListeners();
 });
 
