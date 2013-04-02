@@ -24,6 +24,56 @@ body
 	box-shadow: 3px 3px 4px #000;
 }
 
+#hoverOnCalendar
+{
+	position:absolute;
+	background-color:gray;
+	top:0px;
+	left:0px;
+	display:none;
+}
+
+#exportInfo
+{
+	font-size:13px;
+	margin-left:auto;
+	margin-right:auto;
+	position:absolute;
+	top:150px;
+	width:500px;
+	height:300px;
+	background-color:gray;
+	border-radius: 15px 15px 15px 15px;
+	box-shadow: 3px 3px 4px #000;
+	display:none;
+	text-align:center;
+}
+
+th, td #exportTable
+{
+
+	padding:5px;
+	text-align:center;
+
+}
+
+#exportTable
+{
+    margin-left:auto; 
+    margin-right:auto;
+	text-align:center;
+}
+
+
+
+
+#closeExport
+{
+	position:absolute;
+	right:7px;
+	cursor: pointer;
+}
+
 .title
 {
     font-family:Impact;
@@ -228,6 +278,7 @@ body
 	overflow:hidden;
 	padding:5px;
 	text-align:center;
+	white-space:nowrap;
 	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
 	-moz-box-sizing: border-box;    /* Firefox, other Gecko */
 	box-sizing: border-box;         /* Opera/IE 8+ */
