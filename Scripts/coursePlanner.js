@@ -1119,7 +1119,7 @@ $(document).ready(function () {
 
     var autocompleteCategories = ["Attributes", "Campuses", "Colleges", "Disciplines", "Formats", "General Education", "Courses"];
 
-    var searchKeys = ["Attribute", "schedulingAreaCode", "offeringCollegeCodes", "disciplineCode", "classFormat", "genEdCode", "courseNum"];
+    var searchKeys = ["Attribute", "schedulingAreaCode", "offeringCollegeCode", "disciplineCode", "classFormat", "genEdCode", "courseNum"];
     $('#searchBox').catcomplete({
         minLength: 2,
         select: function (event, ui) {
