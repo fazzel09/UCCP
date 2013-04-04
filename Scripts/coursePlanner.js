@@ -102,17 +102,22 @@ $(document).ready(function () {
     }
     function buildRequest() {
         var request = "https://webservices-webdev2.uc.edu/CoursePlanner/CoursePlannerService.svc/GetCoursePlanner?termID='2013B03'"
-        for (var i = 0; i < filterArray.length; i++) {
+        for (var i = 0; i < filterArray.length; i++) 
+		{
             var filter = filterArray[i];
-            if (filter[0] == 'timeSlot') {
+            if (filter[0] == 'timeSlot') 
+			{
                 var startTime = filter[1].split('-')[0];
                 startTime = [startTime.slice(0, 2), ':', startTime.slice(2)].join('');
                 var endTime = filter[1].split('-')[1];
+				var day = filter[1].split(':')[1];
                 endTime = [endTime.slice(0, 2), ':', endTime.slice(2)].join('')
                 request += "&meetingStartTime='" + startTime + "'";
                 request += "&meetingStopTime='" + endTime + "'";
+				request += "&dayOfTheWeek='" +  day + "'";
             }
-            else {
+            else 
+			{
                 request += "&" + searchKeys[filter[0]] + "='" + filter[1] + "'";
             }
         }
@@ -162,8 +167,6 @@ $(document).ready(function () {
         console.log(URL);
         request.open("GET", URL, true);
         request.send();
-
-        resetSearchItems();
     }
     $('#filters').hide();
     var filterArray = new Array();
@@ -205,9 +208,14 @@ $(document).ready(function () {
                 }
             }
 
-            if (filterArray.length == 0) {
+            if (filterArray.length == 0) 
+			{
                 $('#filters').hide();
             }
+			else
+			{
+				search();
+			}
         });
 
         $('#clearFilters').unbind();
@@ -225,9 +233,6 @@ $(document).ready(function () {
         $('#results').height(height + 'px');
         $('#results').nanoScroller();
     }
-
-
-
 
     /* ----- Selection functions, picking time slots on Calendar ----- */
 
@@ -277,19 +282,39 @@ $(document).ready(function () {
 
         $('#results').nanoScroller();
 
-        $('.showSections').click(function (e) {
-            if ($(this).hasClass('expanded')) {
-                $(".sectionData." + event.target.className.split(' ')[1]).hide();
+        $('.showSections').click(function (e) 
+		{
+			e.stopPropagation();
+            if ($(this).hasClass('expanded')) 
+			{
+                $(".sectionData." + e.target.className.split(' ')[1]).hide();
                 $(this).toggleClass('expanded');
                 $('#results').nanoScroller();
             }
-            else {
-                $(".sectionData." + event.target.className.split(' ')[1]).show();
+            else 
+			{
+                $(".sectionData." + e.target.className.split(' ')[1]).show();
                 $(this).toggleClass('expanded');
                 $('#results').nanoScroller();
             }
         });
-
+		
+		$('.courseRow').click(function(event)
+		{
+			console.log($(this).attr('class'));
+			if($(this).find('.showSections').hasClass('expanded'))
+			{
+			    $(".sectionData." + $(this).attr('class').split(' ')[1]).hide();
+                $(this).find('.showSections').toggleClass('expanded');
+                $('#results').nanoScroller();
+			}
+			else
+			{
+			    $(".sectionData." + $(this).attr('class').split(' ')[1]).show();
+                $(this).find('.showSections').toggleClass('expanded');
+                $('#results').nanoScroller();
+			}
+		});
         /*		$('.showSections').toggle(
         function(event){
         $(".sectionData."+event.target.className.split(' ')[1]).show();
@@ -364,7 +389,7 @@ $(document).ready(function () {
         //For each day the section is on, compute the width
         for (var i = 0; i < addedCourse.days.length; i++) {
             var addedCourseDay = addedCourse.days[i];
-            var startPositionX = $('.' + addedCourseDay).offset().left - $('#calendar').offset().left
+            var startPositionX = $('#calendar .' + addedCourseDay).offset().left - $('#calendar').offset().left
 
             $('#calendar').append('<div class="sectionOverlay ' + addedCourse.callNum + ' ' + addedCourseDay + '">' + addedCourse.sectionBlock + '</div>');
             $('.sectionOverlay.' + addedCourse.callNum + '.' + addedCourseDay).css({ width: dayWidth,
@@ -412,7 +437,7 @@ $(document).ready(function () {
         //For each day the section is on, compute the size, color, etc...
         for (var i = 0; i < addedCourse.days.length; i++) {
             var addedCourseDay = addedCourse.days[i];
-            var startPositionX = $('.' + addedCourseDay).offset().left - $('#calendar').offset().left
+            var startPositionX = $('#calendar td.' + addedCourseDay).offset().left - $('#calendar').offset().left
 
             $('#calendar').append('<div class="sectionBlock ' + addedCourse.callNum + ' ' + addedCourseDay + '">' + addedCourse.sectionBlock + '</div>');
             $('.sectionBlock.' + addedCourse.callNum + '.' + addedCourseDay).css({
@@ -691,6 +716,7 @@ $(document).ready(function () {
     }
 
     function deleteSelectedCourse(callNum) {
+		$('#hoverOnCalendar').hide();
         $('.ui-dialog').hide();
         $('s .sectionRow.' + callNum + ', .sectionBlock.' + callNum).hide();
         $('s .sectionRow.' + callNum + ', .sectionBlock.' + callNum).remove();
@@ -772,7 +798,8 @@ $(document).ready(function () {
 
         searchStartTime = String(startTime);
         searchEndTime = String(endTime);
-        console.log('startTime: ' + searchStartTime + ', ' + searchEndTime);
+        searchDay = day;
+		console.log('startTime: ' + searchStartTime + ', ' + searchEndTime);
 
         addTimeSlotFilter();
     }
@@ -801,9 +828,12 @@ $(document).ready(function () {
         console.log(labelString);
         addFilter({
             category: "timeSlot",
-            disp: labelString,
-            key: searchStartTime + "-" + searchEndTime
+            disp: labelString+":"+searchDay,
+            key: searchStartTime + "-" + searchEndTime+":"+searchDay
         });
+
+		
+		search();
 
         $('.selectionBox').css('opacity', .5);
     }
@@ -820,7 +850,6 @@ $(document).ready(function () {
         }
 
         iterateOverDays(day, time, findFreeSlot);
-        //search();
     });
 
     //Reset the listeners that display the selection box over the calendar. This must be done after a selection, to be ready for the next selection.
@@ -837,7 +866,6 @@ $(document).ready(function () {
             $('.selectionBox').css({ 'top': top, 'left': left, 'width': dayWidth, 'height': '0' });
 
             $('#calendar .' + searchDay + ', .selectionBox').mousemove(function (e) {
-                //console.log('target: ' + e.target.className);
                 var height = e.pageY - $('#calendar').offset().top - top;
                 if (height < 0) {
                     $('.selectionBox').css('top', top + height + 2);
@@ -913,7 +941,6 @@ $(document).ready(function () {
     });
 
     $(window).resize(function (e) {
-        console.log('Resize');
         dayWidth = $('.T').position().left - $('.M').position().left;
 
         if ($('.selectionBox').length) {
@@ -936,6 +963,7 @@ $(document).ready(function () {
         checkConflicts(sunday, null, 'U');
 
     });
+
 
     $('#searchDialog').dialog({
         autoOpen: false,
@@ -1010,8 +1038,11 @@ $(document).ready(function () {
                 $('.selectionBox, #calendar td, #calendar, #calendar .' + searchDay + ', .sectionBlock').unbind();
                 console.log('mouseup ' + e.target.className);
                 resetSelectionListeners();
+				$('.selectionBox').remove();
+				$('#hoverOnCalendar').remove();
             });
         });
+		
 
         //Add a listener on the section block on the calendar to overlay detailed section info.
         /*
@@ -1057,31 +1088,6 @@ $(document).ready(function () {
 
     $("#closeExport").click(function () {
         $("#exportInfo").css('display', 'none');
-    });
-
-    $(window).resize(function (e) {
-        console.log('Resize');
-        dayWidth = $('.T').position().left - $('.M').position().left;
-
-        if ($('.selectionBox').length) {
-            $('.selectionBox').css('width', dayWidth);
-            $('.selectionBox.M').css('left', $('.M').offset().left - $('#calendar').offset().left);
-            $('.selectionBox.T').css('left', $('.T').offset().left - $('#calendar').offset().left);
-            $('.selectionBox.W').css('left', $('.W').offset().left - $('#calendar').offset().left);
-            $('.selectionBox.R').css('left', $('.R').offset().left - $('#calendar').offset().left);
-            $('.selectionBox.F').css('left', $('.F').offset().left - $('#calendar').offset().left);
-            $('.selectionBox.S').css('left', $('.S').offset().left - $('#calendar').offset().left);
-            $('.selectionBox.U').css('left', $('.U').offset().left - $('#calendar').offset().left);
-        }
-
-        checkConflicts(monday, null, 'M');
-        checkConflicts(tuesday, null, 'T');
-        checkConflicts(wednesday, null, 'W');
-        checkConflicts(thursday, null, 'R');
-        checkConflicts(friday, null, 'F');
-        checkConflicts(saturday, null, 'S');
-        checkConflicts(sunday, null, 'U');
-
     });
 
     $('#searchDialog').dialog({
@@ -1125,6 +1131,7 @@ $(document).ready(function () {
         select: function (event, ui) {
             addFilter(ui.item);
             event.preventDefault();
+			search();
         },
 
         source: function (request, response) {
@@ -1155,18 +1162,9 @@ $(document).ready(function () {
         search();
     });
 
-    function resetSearchItems() {
-        searchStartTime = '0700';
-        searchEndTime = '2200';
-        searchDays = 'MTWRFSU';
-        searchDiscipline = '';
-        searchCollege = '';
-        searchBOK = ''
-    }
-
     var searchStartTime;
     var searchEndTime;
-    var searchDays;
+    var searchDay;
     var searchDiscipline;
     var searchCollege;
     var searchBOK;
@@ -1184,18 +1182,7 @@ $(document).ready(function () {
     var saturday = new Day();
     var sunday = new Day();
 
-    /*	for(var i=0;i<181;i++)
-    {
-    monday[i]=new CalendarBlock(null);
-    tuesday[i]=new CalendarBlock(null);
-    wednesday[i]=new CalendarBlock(null);
-    thursday[i]=new CalendarBlock(null);
-    friday[i]=new CalendarBlock(null);
-    saturday[i]=new CalendarBlock(null);
-    sunday[i]=new CalendarBlock(null);
-    }*/
     var filters = new Array()
-
 
     resetSelectionListeners();
 });
