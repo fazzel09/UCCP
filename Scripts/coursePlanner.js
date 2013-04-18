@@ -16,8 +16,10 @@ $(document).ready(function () {
         this.color = getRandomColor();
         this.creditHours = creditHours.trim();
         this.description = description.trim();
-        this.startDate = startDate.trim();
-        this.endDate = endDate.trim();
+        this.startDate = new Date()
+		this.startDate.setFullYear(startDate.trim().split('T')[0].split('-')[0],startDate.trim().split('T')[0].split('-')[1]-1,startDate.trim().split('T')[0].split('-')[2]);
+        this.endDate = new Date();
+		this.endDate.setFullYear(endDate.trim().split('T')[0].split('-')[0],endDate.trim().split('T')[0].split('-')[1],endDate.trim().split('T')[0].split('-')[2])
         this.isUnderGrad = isUnderGrad.trim();
         this.isGrad = isGrad.trim();
         this.instructor = instructor.trim();
@@ -97,9 +99,6 @@ $(document).ready(function () {
         this.sectionBlocks = new Array();
     }
 
-    function jsonCallback(data) {
-        console.log("Callback");
-    }
     function buildRequest() {
         var request = "https://webservices-webdev2.uc.edu/CoursePlanner/CoursePlannerService.svc/GetCoursePlanner?termID='2013B03'"
         for (var i = 0; i < filterArray.length; i++) {
@@ -896,7 +895,6 @@ $(document).ready(function () {
     }
 
     $("#export").click(function () {
-
         $('#exportTable').html('<tr><th>Course Name</th><th>Call Number</th><th>Credits</th><th>G/UG</th></tr>');
         for (var i = 0; i < selectedCourses.length; i++) {
             $('#exportTable tr:last').after('<tr><td>' + selectedCourses[i].courseName + '</td>'
@@ -904,10 +902,24 @@ $(document).ready(function () {
 					+ '<td>' + selectedCourses[i].courseCredits + '</td>'
 					+ '<td>U</td>');
         }
+		
+		$("#exportInfo").append('<button id="downloadCal" value="downloadCal">Download Calendar</button>');
 
         $("#exportInfo").css('display', 'block');
-    });
-
+    	$("#downloadCal").click(function (){
+			var calendarString = generateCalendar();
+			$.ajax({
+                type: 'POST',
+                url: 'Scripts/database.php',
+                data: {
+                    generateCalendar:calendarString
+                },
+                success: function (data){
+                    window.location.assign(window.location.protocol+"//"+window.location.host+window.location.pathname.split('index.php')[0]+'Scripts/database.php?downloadCalendar');
+                }
+            });		
+		});
+	});
     $("#closeExport").click(function () {
         $("#exportInfo").css('display', 'none');
     });
@@ -969,7 +981,139 @@ $(document).ready(function () {
 	    }
 
 	});
-
+	function generateCalendar()
+	{
+				var icalString = "BEGIN:VCALENDAR\nPRODID:-//Google Inc//Google Calendar 70.9054//EN\nVERSION:2.0\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\nX-WR-CALNAME:UCCPCal";
+		for(var i=0; i<selectedCourses.length; i++)
+		{
+			var course = selectedCourses[i];
+			var startDate = course.startDate;
+			var year = startDate.getUTCFullYear();
+			var month = startDate.getUTCMonth()+1;
+			var date = startDate.getUTCDate();
+			
+			if(month<10)
+				month = "0"+month;
+			if(date<10)
+				date = "0"+date;
+			
+			var day = ""+year+month+date;
+			
+			var startTime = course.startTime.numeric;
+			if(startTime<999)
+			{
+				startTime = "0"+startTime;	
+			}
+			startDate = day+"T";
+			
+			var endTime = course.endTime.numeric;
+			if(endTime<999)
+			{
+				endTime = "0"+endTime;	
+			}
+			
+			var endDate = course.endDate;
+			var year = endDate.getUTCFullYear();
+			var month = endDate.getUTCMonth();
+			var date = endDate.getUTCDate();
+			
+			if(month<10)
+				month = "0"+month;
+			if(date<10)
+				date = "0"+date;
+			
+			var day = ""+year+month+date;
+			
+			var endTime = course.endTime.numeric;
+			if(startTime<999)
+			{
+				endTime = "0"+endTime;	
+			}
+			endDate = day+"T"+endTime+"00"
+			
+			
+			var days = course.days;
+			var dayString = ""
+			var dayNum = "";
+			for(var j=0;j<days.length;j++)
+			{
+				var day = days[j];
+				switch(day)
+				{
+					case 'U':
+					{
+						dayNum += "0";
+						dayString+='SU';
+						break;	
+					}
+					case 'M':
+					{
+						dayNum += "1";
+						dayString+='MO';
+						break;	
+					}
+					case 'T':
+					{
+						dayNum += "2";
+						dayString+='TU';
+						break;	
+					}
+					case 'W':
+					{
+						dayNum += "3";
+						dayString+='WE';
+						break;
+					}
+					case 'R':
+					{
+						dayNum += "4";
+						dayString+='TH';
+						break;
+					}
+					case 'F':
+					{
+						dayNum += "5";
+						dayString+='FR';
+						break;	
+					}
+					case 'S':
+					{
+						dayNum += "6"
+						dayString+='SA';
+						break;
+					}
+					default:
+					{
+						break;
+					}
+				}
+				
+				if(j != days.length-1)
+				{
+				dayString += ',';
+				}
+			}
+			var xDate = ""
+			var found = false;
+			for(var k=0; k<dayNum.length; k++)
+			{
+				console.log("GetDay: "+course.startDate.getDay());
+				console.log("DayNum: "+parseInt(dayNum[k],10));
+				if(parseInt(dayNum[k],10) == course.startDate.getDay())
+				{
+					found = true;
+				}
+			}
+			if(!found)
+			{
+				xDate = "XDATE;TZID=America/New_York:"+startDate+startTime+"00\n";
+			}
+			
+			icalString = icalString+"\nBEGIN:VEVENT\nDTSTART;TZID=America/New_York:"+startDate+startTime+"00"+"\nDTEND;TZID=America/New_York:"+startDate+endTime+"00"+"\nRRULE:FREQ=WEEKLY;UNTIL="+ endDate+";BYDAY="+dayString+"\n"+xDate+"SUMMARY:'"+course.courseNum+"'\nSTATUS:CONFIRMED\nEND:VEVENT";
+		}
+		icalString+="\nEND:VCALENDAR";
+		return icalString;	
+	}
     //Reset the listeners that display the selection box over the calendar. This must be done after a selection, to be ready for the next selection.
     function resetSelectionListeners() {
         $('#calendar td').mousedown(function (e) {
@@ -1195,8 +1339,6 @@ $(document).ready(function () {
     sunday[i]=new CalendarBlock(null);
     }*/
     var filters = new Array()
-
-
     resetSelectionListeners();
 });
 

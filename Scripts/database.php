@@ -97,17 +97,20 @@ class DB{
 
 $DB = new DB();
 $DB->connect();
-if(isset($_POST['search']))
+if(isset($_POST['generateCalendar']))
 {
-	$DB->searchCourses($_POST['search'],$_POST['startTime'],$_POST['endTime']);	
+	header('Content-Type: text/plain; charset=utf-8');
+	header('Content-Disposition: attachment; filename=calendar.ical');
+	
+	$output = fopen('calendar.ical','w');
+	fputs($output,$_POST['generateCalendar']);	
+	fclose($output);	
 }
-if(isset($_POST['searchSections']))
+if(isset($_GET['downloadCalendar']))
 {
-	$DB->searchSections($_POST['searchSections']);
-}
-if(isset($_POST['selectionSearchDay']) && isset($_POST['searchStartTime']) && isset($_POST['searchEndTime']))
-{	
-	$DB->selectionSearch($_POST['selectionSearchDay'], $_POST['searchStartTime'], $_POST['searchEndTime'] );	
+	header('Content-Type: text/plain; charset=utf-8');
+	header('Content-Disposition: attachment; filename=calendar.ical');
+	readfile('calendar.ical');	
 }
 if(isset($_POST['autoComplete']))
 {
